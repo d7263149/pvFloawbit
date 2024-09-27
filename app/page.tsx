@@ -77,7 +77,7 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
 
 
         {data.map(item => (
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 mt-8">
+          <Table.Row key={item.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 mt-8">
             <Table.Cell className="p-4">
               {/* <Checkbox /> */}
             </Table.Cell>
