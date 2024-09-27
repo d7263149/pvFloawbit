@@ -54,7 +54,7 @@ const [formData, setFormData] = useState({
   });
 
   // Handle input changes
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { id: any; value: any; }; }) => {
     const { id, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
