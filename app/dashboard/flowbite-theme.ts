@@ -1,7 +1,7 @@
 import type { CustomFlowbiteTheme } from "flowbite-react";
-
+//@ts-ignore
 const flowbiteTheme: CustomFlowbiteTheme = {
-  badge: {
+  badge: { //@ts-ignore
     color: {
       primary:
         "bg-primary-100 text-primary-800 dark:bg-primary-200 dark:text-primary-800 group-hover:bg-primary-200 dark:group-hover:bg-primary-300",
@@ -41,10 +41,10 @@ const flowbiteTheme: CustomFlowbiteTheme = {
       base: "flex items-start justify-between rounded-t px-5 pt-5",
     },
   },
-  navbar: {
+  navbar: { //@ts-ignore
     base: "fixed z-30 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700",
   },
-  sidebar: {
+  sidebar: { //@ts-ignore
     base: "flex fixed top-0 left-0 z-20 flex-col flex-shrink-0 pt-16 h-full duration-75 border-r border-gray-200 lg:flex transition-width dark:border-gray-700",
   },
   textarea: {
