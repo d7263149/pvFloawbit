@@ -38,10 +38,10 @@ const ExampleSidebar: FC = function () {
           <Sidebar.Items>
             <Sidebar.ItemGroup>
               <Sidebar.Item
-                href="/dashoboard"
+                href="/dashboard"
                 icon={HiChartPie}
                 className={
-                  "/" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
+                  "/dashboard" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
                 }
               >
                 Dashboard
