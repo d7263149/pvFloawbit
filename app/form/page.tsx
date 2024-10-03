@@ -9,8 +9,13 @@ import { db } from "../../compnents/firebase"
 import Header from '../../compnents/header';
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
 import { useEffect } from "react";
+
+import {signOut, useSession} from 'next-auth/react'
+
+
 export default function Homed() {
 
+  const session = useSession();
 
 //@ts-ignore
 const [data, setDogs] = React.useState<Dog[]>([]);
@@ -50,6 +55,7 @@ const [formData, setFormData] = useState({
     name: '',
     description: '',
     duration: '',
+
     cost: ''
   });
 
@@ -74,7 +80,8 @@ const [formData, setFormData] = useState({
           name: formData.name,
           description: formData.description,
           duration: formData.duration,
-          cost: formData.cost
+          cost: formData.cost,
+          byemail: session?.data?.user?.email,
         });
         setAlert("block");
         console.log('Document written with ID: ', docRef.id);
@@ -99,7 +106,7 @@ const [formData, setFormData] = useState({
         <Header/>
 
 
-        <Card href="#" className="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+        <Card  className="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <h3 className="mb-4 mt-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900  dark:text-white">Add Service</h3>
     </Card>
 
@@ -108,7 +115,7 @@ const [formData, setFormData] = useState({
     <section className="body p-7 " style={{minHeight:'300px', display: 'block',  marginLeft: 'auto',  marginRight: 'auto',  width: '40%'}}>
     <div className="overflow-x-auto">
       
-    <Card href="#" className="max-w-sm">
+    <Card  className="max-w-sm">
 
     <Alert id="alert" style={{display:alert}} color="success">
       <span className="font-medium">Info alert!</span> Successfully save
@@ -126,7 +133,7 @@ const [formData, setFormData] = useState({
       </div>
       <div>
         <div className="mb-2 block">
-          <Label htmlFor="description"   value="duration"  />
+          <Label htmlFor="description"   value="description"  />
           
         </div>
         <TextInput id="description" type="text" value={formData.description}
