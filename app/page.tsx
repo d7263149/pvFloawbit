@@ -8,7 +8,7 @@ export default function Home() {
   return (
      <>
      <Home1/>
-  {/* <div>{session?.data?.user?.name }</div> */}
+  {/* <div>{session?.data?.user?.name } </div> */}
 {/* <button onClick={()=> signOut()}>Logout</button> */}
 </>
   );
