@@ -237,7 +237,7 @@ useEffect(() => {
 
         console.log(dogsArray);
 // setRowData(dogsArray)
-dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
+// dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
 
 // setRowData(dogsArray)
 //       setRowDataold(dogsArray)
