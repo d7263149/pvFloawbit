@@ -124,7 +124,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
             </div>
           </div>
         </div>
-        <Pagination />
+        {/* <Pagination /> */}
       </NavbarSidebarLayout>
     );
   };
