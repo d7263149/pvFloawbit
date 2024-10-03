@@ -271,7 +271,7 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
 
 
         {data.map(item => (
-          <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Table.Row key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
             <Table.Cell className="w-4 p-4">
               <div className="flex items-center">
                 <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
