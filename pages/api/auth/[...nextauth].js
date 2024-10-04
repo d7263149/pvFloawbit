@@ -11,16 +11,16 @@ export const authOptions = {
   
     // ...add more providers here
   ],
-  callbacks: {
-    async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      // if (url.startsWith("/")) return `${baseUrl}${url}`
-      if (url.startsWith("/")) return '/dashboard'
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
-      return '/dashboard'
-    }
-  }
+  // callbacks: {
+  //   async redirect({ url, baseUrl }) {
+  //     // Allows relative callback URLs
+  //     // if (url.startsWith("/")) return `${baseUrl}${url}`
+  //     if (url.startsWith("/")) return '/dashboard'
+  //     // Allows callback URLs on the same origin
+  //     else if (new URL(url).origin === baseUrl) return url
+  //     return '/dashboard'
+  //   }
+  // }
 }
 
 export default NextAuth(authOptions)
