@@ -7,7 +7,6 @@ import { Footer } from "flowbite-react";
 import { Checkbox, Table } from "flowbite-react";
 import Header from '../../compnents/header';
 import { db } from "../../compnents/firebase"
-import Menu  from "../../compnents/Menu"
 
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } from 'firebase/firestore'
 import { useEffect } from "react";
@@ -66,15 +65,62 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
       </Navbar.Brand>
       
       
-   
-       <Menu/>
+      {!session?.data ?(
+<>
+<div className="flex md:order-3">
+      <DarkThemeToggle />
+        
+      
+      </div>
+<Navbar.Collapse>
+  
+ <Navbar.Link href="/login" active>
+          Login
+        </Navbar.Link>
+        <Navbar.Link href="/supplier" active>
+        Supplier 
+        </Navbar.Link>
+        </Navbar.Collapse>
+       </>
+): (
+<>
+
+<div className="flex md:order-3">
+      <DarkThemeToggle />
+        <Dropdown
+          arrowIcon={false}
+          inline
+          label={
+            <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+          }
+        >
+          <Dropdown.Header>
+            <span className="block text-sm">Bonnie Green</span>
+            <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+          </Dropdown.Header>
+          <Dropdown.Item href="dashboard">Dashboard</Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={()=> signOut({ callbackUrl: '/' })}>Sign out</Dropdown.Item>
+        </Dropdown>
+        <Navbar.Toggle />
+      </div>
+
+      
+<Navbar.Collapse>
+  <Navbar.Link href="/" active>
+          Home
+        </Navbar.Link>
+        <Navbar.Link href="form">Service</Navbar.Link>
+        
+        </Navbar.Collapse></>)
+
+}
+       
  
       
     </Navbar>
 
     </header>
-
-    {/* <Header/> */}
 
 <Card href="#" className="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <h3 className="mb-4 mt-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900  dark:text-white">Featured Service</h3>
