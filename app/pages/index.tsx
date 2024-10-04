@@ -58,7 +58,7 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
         
    
 
-        {/* <header>
+        <header>
        <Navbar fluid rounded>
       <Navbar.Brand href="/">
         <img src="https://flowbite.com/docs/images/logo.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />
@@ -72,9 +72,9 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
       
     </Navbar>
 
-    </header> */}
+    </header>
 
-    <Header/>
+    {/* <Header/> */}
 
 <Card href="#" className="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <h3 className="mb-4 mt-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900  dark:text-white">Featured Service</h3>

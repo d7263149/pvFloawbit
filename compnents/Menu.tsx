@@ -40,8 +40,8 @@ export default function Menu() {
           }
         >
           <Dropdown.Header>
-            <span className="block text-sm">Bonnie Green</span>
-            <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+            <span className="block text-sm">{session?.data?.user?.name}</span>
+            <span className="block truncate text-sm font-medium">{session?.data?.user?.email}</span>
           </Dropdown.Header>
           <Dropdown.Item href="dashboard">Dashboard</Dropdown.Item>
           <Dropdown.Divider />
