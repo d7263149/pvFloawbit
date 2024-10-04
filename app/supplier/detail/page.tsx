@@ -14,7 +14,7 @@ import {signOut, useSession} from 'next-auth/react'
 
 
 export default function Homed() {
-
+  const mainurl = process.env.NEXT_PUBLIC_URL;
   const session:any = useSession();
 
 //@ts-ignore
@@ -96,6 +96,10 @@ const [formData, setFormData] = useState({
           role: 'supplier',
         });
         setAlert("block");
+        setTimeout(function(){  
+          window.location.href=mainurl+'/dashboard';
+         }, 2000);
+        
         console.log('Document written with ID: ', docRef.id);
       } catch (e) {
         console.error('Error adding document: ', e);
@@ -115,19 +119,24 @@ const [formData, setFormData] = useState({
   return (
     <main className="">
         
-        <Header/>
+        {/* <Header/> */}
 
-
+{/* 
         <Card  className="bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <h3 className="mb-4 mt-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900  dark:text-white">Add Supplier</h3>
-    </Card>
+    </Card> */}
 
 
 
-    <section className="body p-7 " style={{minHeight:'300px', display: 'block',  marginLeft: 'auto',  marginRight: 'auto',  width: '40%'}}>
-    <div className="overflow-x-auto">
-      
-    <Card  className="max-w-sm">
+<div className="mt-[40px]">
+       <div className="company-logo text-center">
+            <a href="https://perfexcrm.com/demo/" className="logo img-responsive">
+        <img src="https://perfexcrm.com/demo/uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" className="img-responsive" alt="Perfex CRM" />
+        </a>        </div>
+
+       <h1 className="  tw-text-2xl tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-10">
+            Registeration        </h1>
+    <Card  className="max-w-sm  center-card1  mt-[20px]">
 
     <Alert id="alert" style={{display:alert}} color="success">
       <span className="font-medium">Info alert!</span> Successfully save
@@ -175,12 +184,10 @@ const [formData, setFormData] = useState({
         <Checkbox id="remember" />
         <Label htmlFor="remember">Remember me</Label>
       </div> */}
-      <Button type="submit">Submit</Button>
+      <Button type="submit">Save</Button>
     </form>
     </Card>
-
-    </div>
-    </section>
+</div>
 
 
 
@@ -191,7 +198,8 @@ const [formData, setFormData] = useState({
 
 
 
-    <Footer container>
+
+    {/* <Footer container>
       <div className="w-full text-center">
         <div className="w-full justify-between sm:flex sm:items-center sm:justify-between">
           <Footer.Brand
@@ -210,7 +218,7 @@ const [formData, setFormData] = useState({
         <Footer.Divider />
         <Footer.Copyright href="#" by="Flowbite™" year={2022} />
       </div>
-    </Footer>
+    </Footer> */}
 
       {/* <h1 className="text-2xl dark:text-white">Flowbite React + Next.js</h1>
       <DarkThemeToggle /> */}

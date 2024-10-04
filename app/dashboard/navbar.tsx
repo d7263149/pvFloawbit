@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 
 const ExampleNavbar: FC = function () {
     const session = useSession();
+    const mainurl = process.env.NEXT_PUBLIC_URL;
   return (
     <Navbar fluid>
       <div className="w-full p-3 lg:px-5 lg:pl-3">
@@ -58,7 +59,7 @@ const ExampleNavbar: FC = function () {
           </Dropdown.Header>
           <Dropdown.Item href="dashboard">Dashboard</Dropdown.Item>
           <Dropdown.Divider />
-          <Dropdown.Item onClick={()=> signOut({ callbackUrl: '../' })}>Sign out</Dropdown.Item>
+          <Dropdown.Item onClick={()=> signOut({ callbackUrl: mainurl })}>Sign out</Dropdown.Item>
         </Dropdown>
         <Navbar.Toggle />
  

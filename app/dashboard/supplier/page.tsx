@@ -255,10 +255,14 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                 </Label>
                 <Checkbox id="select-all" name="select-all" />
               </Table.HeadCell>
-              <Table.HeadCell>Name</Table.HeadCell>
+              <Table.HeadCell>Company</Table.HeadCell>
+              <Table.HeadCell>Contact</Table.HeadCell>
+              <Table.HeadCell>Phone</Table.HeadCell>
+              <Table.HeadCell>Address</Table.HeadCell>
+              <Table.HeadCell>description</Table.HeadCell>
               {/* <Table.HeadCell>email</Table.HeadCell> */}
               {/* <Table.HeadCell>Country</Table.HeadCell> */}
-              <Table.HeadCell>Status</Table.HeadCell>
+              {/* <Table.HeadCell>Status</Table.HeadCell> */}
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
@@ -283,20 +287,43 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                   />
                   <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     <div className="text-base font-semibold text-gray-900 dark:text-white">
-                    {item?.name}
+                    {item?.company}
                     </div>
                     <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     {item?.email}
                     </div>
                   </div>
                 </Table.Cell>
-               
+
                 <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.contact}
+                  </div>
+                </Table.Cell>
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.phone}
+                  </div>
+                </Table.Cell>
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.address}
+                  </div>
+                </Table.Cell>
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.description}
+                  </div>
+                </Table.Cell>
+
+
+               
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                     <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
                     Active
                   </div>
-                </Table.Cell>
+                </Table.Cell> */}
                 <Table.Cell>
                   <div className="flex items-center gap-x-3 whitespace-nowrap">
                     <EditUserModal />
@@ -322,12 +349,12 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
         <Button color="primary" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiOutlinePencilAlt className="text-lg" />
-            Edit user
+            Edit
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
           <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Edit user</strong>
+            <strong>Edit</strong>
           </Modal.Header>
           <Modal.Body>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -431,12 +458,12 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
         <Button color="failure" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiTrash className="text-lg" />
-            Delete user
+            Delete 
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
           <Modal.Header className="px-6 pt-6 pb-0">
-            <span className="sr-only">Delete user</span>
+            <span className="sr-only">Delete </span>
           </Modal.Header>
           <Modal.Body className="px-6 pt-0 pb-6">
             <div className="flex flex-col items-center gap-y-6 text-center">

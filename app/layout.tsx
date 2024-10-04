@@ -26,8 +26,10 @@ export default async function RootLayout({
 }>) {
 
 const session =  await getServerSession(authOptions);
+
+{/* <Flowbite theme={{ mode: 'dark' }}></Flowbite> */}
   return (
-    <Flowbite theme={{ mode: 'dark' }}>
+    <Flowbite theme={{ mode: 'light' }}>
     <html lang="en" suppressHydrationWarning={true}>
     <head>
         <ThemeModeScript />

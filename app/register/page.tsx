@@ -22,7 +22,7 @@ return(
         </a>        </div>
 
        <h1 className="  tw-text-2xl tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-10">
-            Login        </h1>
+            Registeration        </h1>
 
    <Card className="max-w-sm  center-card1  mt-[20px]">
    <div className="flex flex-col gap-4">
@@ -49,8 +49,8 @@ return(
    {/* <button onClick={()=>signIn('google')}>Login google </button> */}
    
      
-     <Button onClick={()=>signIn('google',{ callbackUrl: '/dashboard' })} type="submit">Google Login</Button>
-     <Button  color="dark" href={mainurl+'/register'}>Register</Button>
+     <Button onClick={()=>signIn('google',{ callbackUrl: `${mainurl}/supplier/detail` })} type="submit">Google Registeration</Button>
+     <Button  color="dark" href={mainurl+'/login'}>Login</Button>
    </div>
  </Card>
  </div>

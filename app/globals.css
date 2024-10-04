@@ -4,7 +4,7 @@
 
 
 body{
-    background-color: rgb(128 128 128 / 87%) !important;
+    background-color: #f1f5f9 !important;
 }
 .dark body{
     background-color: rgb(0 0 0 / 87%)!important;
@@ -12,15 +12,26 @@ body{
 .center-card{
     margin: auto;
     width: 50%;
-    border: 3px solid green;
+    /* border: 3px solid rgb(255 255 255); */
     padding: 10px;
     margin-top: 80px;
+   
+}
+.text-center{
+    text-align: -webkit-center;
+}
+.center-card1{
+    margin: auto;
+    width: 50%;
 }
 
+h1{
+    font-size: 40px;
+}
 
-
-
-
+main{
+    padding: 20px;;
+}
 
 
 

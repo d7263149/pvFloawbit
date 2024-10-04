@@ -15,7 +15,7 @@ import {signOut, useSession} from 'next-auth/react'
 
 
 export default function Homed() {
-
+  const mainurl = process.env.NEXT_PUBLIC_URL;
   const session = useSession();
   console.log('session',session);
 //@ts-ignore
@@ -64,7 +64,7 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React </span>
       </Navbar.Brand>
       
-      
+      {/* ////////////////////////menu start */}
       {!session?.data ?(
 <>
 <div className="flex md:order-3">
@@ -95,12 +95,12 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
           }
         >
           <Dropdown.Header>
-            <span className="block text-sm">Bonnie Green</span>
-            <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+            <span className="block text-sm">{session?.data?.user?.name}</span>
+            <span className="block truncate text-sm font-medium">{session?.data?.user?.email}</span>
           </Dropdown.Header>
           <Dropdown.Item href="dashboard">Dashboard</Dropdown.Item>
           <Dropdown.Divider />
-          <Dropdown.Item onClick={()=> signOut({ callbackUrl: '/' })}>Sign out</Dropdown.Item>
+          <Dropdown.Item onClick={()=> signOut({ callbackUrl: mainurl })}>Sign out</Dropdown.Item>
         </Dropdown>
         <Navbar.Toggle />
       </div>
@@ -115,7 +115,7 @@ dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount)
         </Navbar.Collapse></>)
 
 }
-       
+       {/* ==================mentu */}
  
       
     </Navbar>

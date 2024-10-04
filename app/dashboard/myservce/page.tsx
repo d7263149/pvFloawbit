@@ -132,7 +132,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
         <Button color="primary" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
-            Add user
+            Add 
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
@@ -203,7 +203,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
           </Modal.Body>
           <Modal.Footer>
             <Button color="primary" onClick={() => setOpen(false)}>
-              Add user
+              Add 
             </Button>
           </Modal.Footer>
         </Modal>
@@ -344,7 +344,7 @@ if(session?.data?.user?.email){
         <Button color="primary" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiOutlinePencilAlt className="text-lg" />
-            Edit service
+            Edit 
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
@@ -453,12 +453,12 @@ if(session?.data?.user?.email){
         <Button color="failure" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiTrash className="text-lg" />
-            Delete user
+            Delete 
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
           <Modal.Header className="px-6 pt-6 pb-0">
-            <span className="sr-only">Delete user</span>
+            <span className="sr-only">Delete </span>
           </Modal.Header>
           <Modal.Body className="px-6 pt-0 pb-6">
             <div className="flex flex-col items-center gap-y-6 text-center">
