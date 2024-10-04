@@ -15,11 +15,20 @@ import {signOut, useSession} from 'next-auth/react'
 
 export default function Homed() {
 
-  const session = useSession();
+  const session:any = useSession();
 
 //@ts-ignore
 const [data, setDogs] = React.useState<Dog[]>([]);
 const [alert, setAlert] = React.useState('none');
+const [getemail, setEmail] = React.useState('');
+
+
+useEffect(() => {
+    setEmail(session?.data?.user?.email);
+  }, [session?.data?.user?.email]);
+
+
+
 useEffect(() => {
 
   // , where("mintType", "==", 'paid') 
@@ -56,7 +65,7 @@ const [formData, setFormData] = useState({
     contact: '',
     phone: '',
     address: '',
-    email: session?.data?.user?.email,
+    email: getemail,
     description: '',
   });
 
@@ -83,7 +92,7 @@ const [formData, setFormData] = useState({
           contact: formData.contact,
           phone: formData.phone,
           address: formData.address,
-          email: session?.data?.user?.email,
+          email: getemail,
           role: 'supplier',
         });
         setAlert("block");
@@ -152,7 +161,7 @@ const [formData, setFormData] = useState({
         <div className="mb-2 block">
           <Label htmlFor="email" value="Email" />
         </div>
-        <TextInput id="email"  value={formData.email?formData.email:''}
+        <TextInput id="email"  value={getemail}
           onChange={handleChange} type="text" required readOnly />
       </div>
       <div>
