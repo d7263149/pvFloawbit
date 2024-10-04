@@ -152,7 +152,7 @@ const [formData, setFormData] = useState({
         <div className="mb-2 block">
           <Label htmlFor="email" value="Email" />
         </div>
-        <TextInput id="email"  value={formData.email}
+        <TextInput id="email"  value={formData.email?formData.email:''}
           onChange={handleChange} type="text" required readOnly />
       </div>
       <div>
