@@ -3,6 +3,7 @@
 "use client";
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
+  Alert,
     Breadcrumb,
     Button,
     Checkbox,
@@ -30,7 +31,8 @@ import {
   import React from "react";
   import { db } from "../../../compnents/firebase"
 
-import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } from 'firebase/firestore'
+import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
+import { useSession } from "next-auth/react";
   
   
   const UserListPage: FC = function () {
@@ -38,12 +40,12 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
       <NavbarSidebarLayout isFooter={false}>
         <div className="flex mb-4 .content">
         <AddUserModal />
-        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+        {/* <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
             Import Expenses
           </div>
-        </Button>
+        </Button> */}
         </div>
         <div className="block items-center justify-between border-b border-gray-200 bg-white  dark:border-gray-700 dark:bg-gray-800 sm:flex">
           <div className="mb-1 w-full">
@@ -124,7 +126,65 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
   
   const AddUserModal: FC = function () {
     const [isOpen, setOpen] = useState(false);
+    // ========================================
+
+
+    const mainurl = process.env.NEXT_PUBLIC_URL;
+    const session:any = useSession();
+    const [alert, setAlert] = React.useState('none');
+    const [getemail, setEmail] = React.useState('');
+    
+  const [formData, setFormData] = useState({
+    byemail: 'admin',
+  name: '',
+  cost: '',
+  duration: '',
+  description: '',
+  });
   
+  // Handle input changes
+  const handleChange = (e: { target: { id: any; value: any; }; }) => {
+  const { id, value } = e.target;
+  setFormData((prevData) => ({
+    ...prevData,
+    [id]: value
+  }));
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  e.preventDefault();
+  console.log('Form Data:', formData);
+  // Process or send formData to a server here
+  
+  try {
+      // Insert into Firestore
+      const docRef = await addDoc(collection(db, 'strexService'), {
+        name: formData.name,
+        description: formData.description,
+        phone: formData.cost,
+        duration: formData.duration,
+        byemail: formData.byemail,
+      });
+      setAlert("block");
+      console.log('Document written with ID: ', docRef.id);
+      // session.user.newid = 23;
+      // session.user.role = 'supplier';
+  
+  
+      setTimeout(function(){  
+        // window.location.href=mainurl+'/dashboard';
+        setOpen(false)
+       }, 2000);
+      
+     
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+    
+  };
+  
+    // ==========================
     return (
       <>
         <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
@@ -134,76 +194,74 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
+        <form onSubmit={handleSubmit} className="">
           <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Add new user</strong>
+            <strong>Add new Service</strong>
           </Modal.Header>
           <Modal.Body>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <Alert id="alert" style={{display:alert}} color="success">
+      <span className="font-medium">Info alert!</span> Successfully save
+    </Alert>
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <Label htmlFor="firstName">First name</Label>
+                <Label htmlFor="firstName">name</Label>
                 <div className="mt-1">
-                  <TextInput
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Bonnie"
-                  />
+                <TextInput id="name" type="text" value={formData.name}
+          onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="lastName">Last name</Label>
+              
+              
+              
+               <div>
+                <Label htmlFor="firstName">Cost</Label>
                 <div className="mt-1">
-                  <TextInput id="lastName" name="lastName" placeholder="Green" />
+                <TextInput id="cost" type="text" value={formData.cost}
+          onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
+
+
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="firstName">Duration</Label>
                 <div className="mt-1">
-                  <TextInput
-                    id="email"
-                    name="email"
-                    placeholder="example@company.com"
-                    type="email"
-                  />
+                <TextInput id="duration"     value={formData.duration}   onChange={handleChange} type="text" required />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="phone">Phone number</Label>
+
+
+
+
+              <div className="mt-2">
+                <Label htmlFor="firstName">Description</Label>
                 <div className="mt-1">
-                  <TextInput
-                    id="phone"
-                    name="phone"
-                    placeholder="e.g., +(12)3456 789"
-                    type="tel"
-                  />
+                <TextInput id="description"  value={formData.description}
+          onChange={handleChange} type="text" required />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="department">Department</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="department"
-                    name="department"
-                    placeholder="Development"
-                  />
-                </div>
+    
+         
+
+
               </div>
-              <div>
-                <Label htmlFor="company">Company</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="company"
-                    name="company"
-                    placeholder="Somewhere"
-                  />
-                </div>
-              </div>
-            </div>
+            
+   
+     
+    
+   
+      {/* <div className="flex items-center gap-2">
+        <Checkbox id="remember" />
+        <Label htmlFor="remember">Remember me</Label>
+      </div> */}
+    
+   
           </Modal.Body>
           <Modal.Footer>
-            <Button color="primary" onClick={() => setOpen(false)}>
+            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
               Add Service
             </Button>
           </Modal.Footer>
+          </form>
         </Modal>
       </>
     );
