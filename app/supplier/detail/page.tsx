@@ -96,11 +96,16 @@ const [formData, setFormData] = useState({
           role: 'supplier',
         });
         setAlert("block");
+        console.log('Document written with ID: ', docRef.id);
+        // session.user.newid = 23;
+        session.user.role = 'supplier';
+
+
         setTimeout(function(){  
           window.location.href=mainurl+'/dashboard';
          }, 2000);
         
-        console.log('Document written with ID: ', docRef.id);
+       
       } catch (e) {
         console.error('Error adding document: ', e);
       }

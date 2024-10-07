@@ -29,20 +29,99 @@ h1{
     font-size: 40px;
 }
 
-main{
-    padding: 20px;;
+
+
+.mainwidth{
+    width: calc(100% - 275px);
 }
 
+.sidebarnew{
+    background: #1c2434!important;
+    height: 100% !important;
+}
+.w-64 {
+    width: unset !important;
+}
+nav .bg-gray-50{
+    background-color: rgb(28 36 52)!important;
+    background: #1c2434!important;
+    padding: 0px!important;
+    color: #f1f5f9!important;
+}
+.sidebarwraper a{
+    color: #f1f5f9!important;
+}
+.sidebarwraper a:hover{
+    color: #f1f5f9!important;
+    background: #334155!important;
+}
+.sidebarwraper a.bg-gray-100{
+    color: #f1f5f9!important;
+    background: #334155!important;
+}
+.logoimage{
+    background: #172032!important;
+    padding: 20px 10px!important;
+}
 
+.py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.mainwrapoer nav.bg-white{
+    background-color: rgb(255, 255, 255);
+    padding-top: 0.25rem!important;
+    padding-bottom: 0.25rem!important;
+}
+.mainwrapoer main{
+    margin: 14px!important;
+   
+}
+body{
+    font-family: Inter, sans-serif;
+}
+#users-search{
+    padding: 7px !important;
+    background: #f1f5f9 !important;
+}
 
+/* ================nesww==========
+ */
 
+ .sidebarwraper{
+    width: 230px;
+    background: #1c2434;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    z-index: 9;
+ }
 
+ #header {
+    background: #fff;
+    display: block;
+    height: 63px;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    z-index: 99;
+    margin-left: 230px;
+    border-bottom: 1px solid #e2e8f0;
+}
 
-
-
-
-
-
-
+#wrapper {
+    margin: 0 0 0 230px;
+    padding: 0;
+    background: #f1f5f9;
+    position: relative;
+    min-height: 100%;
+}
+#wrapper main {
+    padding: 30px;
+    min-width: 320px;
+}
 /* //////////admin css/////////////////////// */
-
+ 

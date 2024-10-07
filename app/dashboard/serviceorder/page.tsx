@@ -130,7 +130,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
         <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
-            Add Supplier
+            Add Service
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
@@ -201,7 +201,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
           </Modal.Body>
           <Modal.Footer>
             <Button color="primary" onClick={() => setOpen(false)}>
-              Add Supplier
+              Add Service
             </Button>
           </Modal.Footer>
         </Modal>
@@ -216,7 +216,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
     useEffect(() => {
     
       // , where("mintType", "==", 'paid') 
-       const dogsCol = query(collection(db, "strexSupplier"), limit(10));
+       const dogsCol = query(collection(db, "strexServiceOrder1"), limit(10000));
       //  let dogsCol = collection(db, 'autoTopTrendingMints');
         const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
             const dogsArray = dogsSnap.docs.map(dogSnap => {
@@ -253,11 +253,12 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                 </Label>
                 <Checkbox id="select-all" name="select-all" />
               </Table.HeadCell>
-              <Table.HeadCell>Company</Table.HeadCell>
-              <Table.HeadCell>Contact</Table.HeadCell>
+              <Table.HeadCell>Customer</Table.HeadCell>
+              {/* <Table.HeadCell>Contact</Table.HeadCell> */}
               <Table.HeadCell>Phone</Table.HeadCell>
-              <Table.HeadCell>Address</Table.HeadCell>
-              <Table.HeadCell>description</Table.HeadCell>
+              <Table.HeadCell>Service</Table.HeadCell>
+              <Table.HeadCell>Date</Table.HeadCell>
+              {/* <Table.HeadCell>description</Table.HeadCell> */}
               {/* <Table.HeadCell>email</Table.HeadCell> */}
               {/* <Table.HeadCell>Country</Table.HeadCell> */}
               {/* <Table.HeadCell>Status</Table.HeadCell> */}
@@ -285,7 +286,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                   />
                   <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     <div className="text-base font-semibold text-gray-900 dark:text-white">
-                    {item?.company}
+                    {item?.name}
                     </div>
                     <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     {item?.email}
@@ -293,11 +294,11 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                   </div>
                 </Table.Cell>
 
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                   {item?.contact}
                   </div>
-                </Table.Cell>
+                </Table.Cell> */}
                 <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                   {item?.phone}
@@ -308,11 +309,11 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                   {item?.address}
                   </div>
                 </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                   {item?.description}
                   </div>
-                </Table.Cell>
+                </Table.Cell> */}
 
 
                

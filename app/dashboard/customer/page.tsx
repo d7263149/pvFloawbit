@@ -2,7 +2,6 @@
 
 "use client";
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
 import {
     Breadcrumb,
     Button,
@@ -28,23 +27,28 @@ import {
     HiTrash,
   } from "react-icons/hi";
   import NavbarSidebarLayout from "../NavbarSidebarLayout";
+  import React from "react";
   import { db } from "../../../compnents/firebase"
 
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } from 'firebase/firestore'
   
+  
   const UserListPage: FC = function () {
-
-
-
-
-
-
     return (
       <NavbarSidebarLayout isFooter={false}>
-        <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
+        <div className="flex mb-4 .content">
+        <AddUserModal />
+        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+          <div className="flex items-center gap-x-3">
+            <HiPlus className="text-xl" />
+            Import Expenses
+          </div>
+        </Button>
+        </div>
+        <div className="block items-center justify-between border-b border-gray-200 bg-white  dark:border-gray-700 dark:bg-gray-800 sm:flex">
           <div className="mb-1 w-full">
             <div className="mb-4">
-              <Breadcrumb className="mb-4">
+              {/* <Breadcrumb className="mb-4">
                 <Breadcrumb.Item href="#">
                   <div className="flex items-center gap-x-3">
                     <HiHome className="text-xl" />
@@ -53,25 +57,14 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                 </Breadcrumb.Item>
                 <Breadcrumb.Item >Suplier</Breadcrumb.Item>
                 <Breadcrumb.Item>List</Breadcrumb.Item>
-              </Breadcrumb>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                All Customer
-              </h1>
+              </Breadcrumb> */}
+              {/* <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                All Suplier
+              </h1> */}
             </div>
             <div className="sm:flex">
               <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
-                <form className="lg:pr-3">
-                  <Label htmlFor="users-search" className="sr-only">
-                    Search
-                  </Label>
-                  <div className="relative mt-1 lg:w-64 xl:w-96">
-                    <TextInput
-                      id="users-search"
-                      name="users-search"
-                      placeholder="Search for users"
-                    />
-                  </div>
-                </form>
+              
                 <div className="mt-3 flex space-x-1 pl-0 sm:mt-0 sm:pl-2">
                   <a
                     href="#"
@@ -104,7 +97,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
                 </div>
               </div>
               <div className="ml-auto flex items-center space-x-2 sm:space-x-3">
-                <AddUserModal />
+                
                 <Button color="gray">
                   <div className="flex items-center gap-x-3">
                     <HiDocumentDownload className="text-xl" />
@@ -134,15 +127,15 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
   
     return (
       <>
-        <Button color="primary" onClick={() => setOpen(true)}>
+        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
-            Add customer
+            Add Customer
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
           <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Add new customer</strong>
+            <strong>Add new user</strong>
           </Modal.Header>
           <Modal.Body>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -208,7 +201,7 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
           </Modal.Body>
           <Modal.Footer>
             <Button color="primary" onClick={() => setOpen(false)}>
-              Add user
+              Add Customer
             </Button>
           </Modal.Footer>
         </Modal>
@@ -217,106 +210,134 @@ import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit } fr
   };
   
   const AllUsersTable: FC = function () {
-//@ts-ignore
-const [data, setDogs] = React.useState<Dog[]>([]);
-
-useEffect(() => {
-
-  // , where("mintType", "==", 'paid') 
-   const dogsCol = query(collection(db, "strexCustomer"), limit(10));
-  //  let dogsCol = collection(db, 'autoTopTrendingMints');
-    const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
-        const dogsArray = dogsSnap.docs.map(dogSnap => {
-          //@ts-ignore
-            const dog = dogSnap.data() as Dog;
-            dog.id = dogSnap.id;
-            return dog;
+    //@ts-ignore
+    const [data, setDogs] = React.useState<Dog[]>([]);
+    
+    useEffect(() => {
+    
+      // , where("mintType", "==", 'paid') 
+       const dogsCol = query(collection(db, "strexCustomer"), limit(10000));
+      //  let dogsCol = collection(db, 'autoTopTrendingMints');
+        const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
+            const dogsArray = dogsSnap.docs.map(dogSnap => {
+              //@ts-ignore
+                const dog = dogSnap.data() as Dog;
+                dog.id = dogSnap.id;
+                return dog;
+            });
+            // console.log('dogsArray1',dogsArray);
+            setDogs(dogsArray)     
+    
+            console.log(dogsArray);
+    // setRowData(dogsArray)
+    dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
+    
+    // setRowData(dogsArray)
+    //       setRowDataold(dogsArray)
+    
+    // console.log('dogsArrayaftershort',dogsArray);
+    
+    
         });
-        // console.log('dogsArray1',dogsArray);
-        setDogs(dogsArray)     
+    
+        return () => unSubscribe();
+    },[]);
+    
+    
+        return (
+          <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600 ">
+            <Table.Head className="bg-gray-100 dark:bg-gray-700">
+              <Table.HeadCell>
+                <Label htmlFor="select-all" className="sr-only">
+                  Select all
+                </Label>
+                <Checkbox id="select-all" name="select-all" />
+              </Table.HeadCell>
+              <Table.HeadCell>Name</Table.HeadCell>
+              {/* <Table.HeadCell>Contact</Table.HeadCell> */}
+              <Table.HeadCell>Phone</Table.HeadCell>
+              <Table.HeadCell>Address</Table.HeadCell>
+              {/* <Table.HeadCell>description</Table.HeadCell> */}
+              {/* <Table.HeadCell>email</Table.HeadCell> */}
+              {/* <Table.HeadCell>Country</Table.HeadCell> */}
+              {/* <Table.HeadCell>Status</Table.HeadCell> */}
+              <Table.HeadCell>Actions</Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+    
+    
+    
+            {data.map(item => (
+              <Table.Row key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                <Table.Cell className="w-4 p-4">
+                  <div className="flex items-center">
+                    <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
+                    <label htmlFor="checkbox-1" className="sr-only">
+                      checkbox
+                    </label>
+                  </div>
+                </Table.Cell>
+                <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src="/images/neil-sims.png"
+                    alt="Neil Sims avatar"
+                  />
+                  <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                    <div className="text-base font-semibold text-gray-900 dark:text-white">
+                    {item?.name}
+                    </div>
+                    <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                    {item?.email}
+                    </div>
+                  </div>
+                </Table.Cell>
 
-        console.log(dogsArray);
-// setRowData(dogsArray)
-// dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
-
-// setRowData(dogsArray)
-//       setRowDataold(dogsArray)
-
-// console.log('dogsArrayaftershort',dogsArray);
-
-
-    });
-
-    return () => unSubscribe();
-},[]);
-
-
-    return (
-      <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-        <Table.Head className="bg-gray-100 dark:bg-gray-700">
-          <Table.HeadCell>
-            <Label htmlFor="select-all" className="sr-only">
-              Select all
-            </Label>
-            <Checkbox id="select-all" name="select-all" />
-          </Table.HeadCell>
-          <Table.HeadCell>Name</Table.HeadCell>
-          {/* <Table.HeadCell>email</Table.HeadCell> */}
-          {/* <Table.HeadCell>Country</Table.HeadCell> */}
-          <Table.HeadCell>Status</Table.HeadCell>
-          <Table.HeadCell>Actions</Table.HeadCell>
-        </Table.Head>
-        <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.contact}
+                  </div>
+                </Table.Cell> */}
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.phone}
+                  </div>
+                </Table.Cell>
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.address}
+                  </div>
+                </Table.Cell>
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                  {item?.description}
+                  </div>
+                </Table.Cell> */}
 
 
-
-        {data.map(item => (
-          <Table.Row key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-            <Table.Cell className="w-4 p-4">
-              <div className="flex items-center">
-                <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
-                <label htmlFor="checkbox-1" className="sr-only">
-                  checkbox
-                </label>
-              </div>
-            </Table.Cell>
-            <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-              <img
-                className="h-10 w-10 rounded-full"
-                src="/images/neil-sims.png"
-                alt="Neil Sims avatar"
-              />
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                <div className="text-base font-semibold text-gray-900 dark:text-white">
-                {item?.name}
-                </div>
-                <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                {item?.email}
-                </div>
-              </div>
-            </Table.Cell>
-           
-            <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-              <div className="flex items-center">
-                <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-                Active
-              </div>
-            </Table.Cell>
-            <Table.Cell>
-              <div className="flex items-center gap-x-3 whitespace-nowrap">
-                <EditUserModal />
-                <DeleteUserModal />
-              </div>
-            </Table.Cell>
-          </Table.Row>
-          ))}
-         
-         
-          
-        </Table.Body>
-      </Table>
-    );
-  };
+               
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                  <div className="flex items-center">
+                    <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
+                    Active
+                  </div>
+                </Table.Cell> */}
+                <Table.Cell>
+                  <div className="flex items-center gap-x-3 whitespace-nowrap">
+                    <EditUserModal />
+                    <DeleteUserModal />
+                  </div>
+                </Table.Cell>
+              </Table.Row>
+              ))}
+             
+             
+              
+            </Table.Body>
+          </Table>
+        );
+      };
+      
   
   const EditUserModal: FC = function () {
     const [isOpen, setOpen] = useState(false);
@@ -326,12 +347,12 @@ useEffect(() => {
         <Button color="primary" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiOutlinePencilAlt className="text-lg" />
-            Edit customer
+            Edit
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
           <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Edit customer</strong>
+            <strong>Edit</strong>
           </Modal.Header>
           <Modal.Body>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -435,12 +456,12 @@ useEffect(() => {
         <Button color="failure" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-2">
             <HiTrash className="text-lg" />
-            Delete user
+            Delete 
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
           <Modal.Header className="px-6 pt-6 pb-0">
-            <span className="sr-only">Delete user</span>
+            <span className="sr-only">Delete </span>
           </Modal.Header>
           <Modal.Body className="px-6 pt-0 pb-6">
             <div className="flex flex-col items-center gap-y-6 text-center">

@@ -14,11 +14,18 @@ const NavbarSidebarLayout: FC<PropsWithChildren<NavbarSidebarLayoutProps>> =
   function ({ children, isFooter = true }) {
     return (
       <>
-        <Navbar />
-        <div className="flex items-start ">
-          <Sidebar />
-          <MainContent isFooter={isFooter}>{children}</MainContent>
+      <div className="maindashbord" id="header">
+      <Navbar />
+      </div>
+      {/* width:'275px' */}
+      <div className="sidebarwraper" style={{}}>
+      <Sidebar  />
+      </div>
+      <div style={{}} className="mainwidth mainwrapoer" id="wrapper">
+        
+        <MainContent isFooter={isFooter}>{children}</MainContent>
         </div>
+       
       </>
     );
   };

@@ -1,4 +1,4 @@
-import { Sidebar, TextInput } from "flowbite-react";
+import { Navbar, Sidebar, TextInput } from "flowbite-react";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import {
@@ -11,6 +11,7 @@ import {
   HiSearch,
   HiShoppingBag,
   HiUsers,
+  HiHome
 } from "react-icons/hi";
 
 const ExampleSidebar: FC = function () {
@@ -23,9 +24,24 @@ const ExampleSidebar: FC = function () {
   }, [setCurrentPage]);
 
   return (
-    <Sidebar aria-label="Sidebar with multi-level dropdown example">
-      <div className="flex h-full flex-col justify-between py-2">
-        <div>
+    <Sidebar aria-label="Sidebar with multi-level dropdown example sidebarnew">
+      <div className="flex h-full flex-col justify-between ">
+        <div className="startdivsss">
+
+
+
+          
+        <div className="flex items-center logoimage">
+            <Sidebar.Items >
+              <img alt="" src="https://perfexcrm.com/demo/uploads/company/b40f7c16311848152fa744df4fda30b2.png" className="mr-3 h-6 sm:h-8" />
+              <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
+                {/* Admin */}
+              </span>
+            </Sidebar.Items>
+          </div>
+
+
+
           <form className="pb-3 md:hidden">
             <TextInput
               icon={HiSearch}
@@ -39,14 +55,14 @@ const ExampleSidebar: FC = function () {
             <Sidebar.ItemGroup>
               <Sidebar.Item
                 href="/dashboard"
-                icon={HiChartPie}
+                icon={HiHome}
                 className={
                   "/dashboard" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
                 }
               >
                 Dashboard
               </Sidebar.Item>
-              <Sidebar.Item
+              {/* <Sidebar.Item
                 href="/"
                 icon={HiChartPie}
                 className={
@@ -54,7 +70,7 @@ const ExampleSidebar: FC = function () {
                 }
               >
                 Website
-              </Sidebar.Item>
+              </Sidebar.Item> */}
               {/* <Sidebar.Item
                 href="/dashboard"
                 icon={HiShoppingBag}
@@ -75,7 +91,7 @@ const ExampleSidebar: FC = function () {
                     : ""
                 }
               >
-                 Supplier list
+                 Supplier List
               </Sidebar.Item>
               <Sidebar.Item
                 href="/dashboard/customer"
@@ -85,22 +101,33 @@ const ExampleSidebar: FC = function () {
                     ? "bg-gray-100 dark:bg-gray-700"
                     : ""
                 }
-              >customer list
+              >Customer List
                
               </Sidebar.Item>
               <Sidebar.Item
-                href="/dashboard/servce"
+                href="/dashboard/service"
                 icon={HiUsers}
                 className={
-                  "/dashboard/servce" === currentPage
+                  "/dashboard/service" === currentPage
                     ? "bg-gray-100 dark:bg-gray-700"
                     : ""
                 }
-              >servce
+              >Service List
                
               </Sidebar.Item>
+              <Sidebar.Item
+                href="/dashboard/serviceorder"
+                icon={HiUsers}
+                className={
+                  "/dashboard/serviceorder" === currentPage
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : ""
+                }
+              >
+               Service Order
+              </Sidebar.Item>
               </Sidebar.ItemGroup>
-              <Sidebar.ItemGroup>
+              {/* <Sidebar.ItemGroup>
               <Sidebar.Item
                 href="/dashboard/myservce"
                 icon={HiUsers}
@@ -112,8 +139,8 @@ const ExampleSidebar: FC = function () {
               >My servce
                
               </Sidebar.Item>
-            </Sidebar.ItemGroup>
-            <Sidebar.ItemGroup>
+            </Sidebar.ItemGroup> */}
+            {/* <Sidebar.ItemGroup>
               <Sidebar.Item
                 href="#"
                 icon={HiClipboard}
@@ -132,7 +159,7 @@ const ExampleSidebar: FC = function () {
               >
                 Help
               </Sidebar.Item>
-            </Sidebar.ItemGroup>
+            </Sidebar.ItemGroup> */}
           </Sidebar.Items>
         </div>
       </div>
