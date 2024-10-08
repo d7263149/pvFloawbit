@@ -50,7 +50,7 @@ if(data?.[0]?.role){
         
         setAlert('block')
 
-    },2000);
+    },5000);
     
 }
 //
