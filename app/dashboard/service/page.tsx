@@ -162,7 +162,7 @@ import { useSession } from "next-auth/react";
       const docRef = await addDoc(collection(db, 'strexService'), {
         name: formData.name,
         description: formData.description,
-        phone: formData.cost,
+        cost: formData.cost,
         duration: formData.duration,
         byemail: session?.data?.user?.email,
       });
@@ -216,7 +216,7 @@ import { useSession } from "next-auth/react";
                <div>
                 <Label htmlFor="firstName">Cost</Label>
                 <div className="mt-1">
-                <TextInput id="cost" type="text" value={formData.cost}
+                <TextInput id="cost" name="cost" type="text" value={formData.cost}
           onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
