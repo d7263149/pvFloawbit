@@ -162,7 +162,7 @@ import { useSession } from "next-auth/react";
       const docRef = await addDoc(collection(db, 'strexService'), {
         name: formData.name,
         description: formData.description,
-        phone: formData.cost,
+        cost: formData.cost,
         duration: formData.duration,
         byemail: session?.data?.user?.email,
       });
@@ -216,7 +216,7 @@ import { useSession } from "next-auth/react";
                <div>
                 <Label htmlFor="firstName">Cost</Label>
                 <div className="mt-1">
-                <TextInput id="cost" type="text" value={formData.cost}
+                <TextInput id="cost" name="cost" type="text" value={formData.cost}
           onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
@@ -320,7 +320,7 @@ import { useSession } from "next-auth/react";
               <Table.HeadCell>Description</Table.HeadCell>
               <Table.HeadCell>Duration</Table.HeadCell>
               <Table.HeadCell>Cost</Table.HeadCell>
-              <Table.HeadCell>By Email</Table.HeadCell>
+              {/* <Table.HeadCell>By Email</Table.HeadCell> */}
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
@@ -367,12 +367,12 @@ import { useSession } from "next-auth/react";
                     {item?.cost}
                   </div>
                 </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                     
                     {item?.byemail}
                   </div>
-                </Table.Cell>
+                </Table.Cell> */}
                 <Table.Cell>
                   <div className="flex items-center gap-x-3 whitespace-nowrap">
                     <EditUserModal />
