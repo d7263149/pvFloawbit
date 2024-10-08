@@ -272,7 +272,7 @@ import { useSession } from "next-auth/react";
     const [data, setDogs] = React.useState<Dog[]>([]);
     const session = useSession();
     useEffect(() => {
-    
+    if(session?.data?.user?.email){
       // , where("mintType", "==", 'paid') 
       //  const dogsCol = query(collection(db, "strexService"), limit(10000));
          const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(1000));
@@ -300,6 +300,8 @@ import { useSession } from "next-auth/react";
         });
     
         return () => unSubscribe();
+      }
+      
     },[]);
     
     
