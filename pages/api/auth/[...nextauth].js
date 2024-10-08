@@ -23,7 +23,14 @@ export const authOptions = {
 
       if (user) {
         // Add custom fields to the JWT
-        token.role = 'supplier';
+
+        if(token.email == 'pnna5555@gmail.com' || token.email == 'pnna5555@gmail.com'){
+          token.role = 'admin';
+        }else{
+          token.role = 'supplier';
+          // supplier
+        }
+        
       }
   
 
@@ -54,8 +61,14 @@ export const authOptions = {
     async session({ session, token, user }) {
           // Add custom properties to the session object
           session.user.id = 'ss';
+          if(session.user.email == 'pnna5555@gmail.com' || session.user.email == 'pnna5555@gmail.com'){
+            session.user.role = 'admin';
+          }else{
+            session.user.role= 'supplier';
+            // supplier
+          }
           session.user.role = token.role;
-          session.accessToken = 'token';
+          session.accessToken = session.user.email;
           return session;
         }
   }

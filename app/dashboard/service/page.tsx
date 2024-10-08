@@ -135,7 +135,7 @@ import { useSession } from "next-auth/react";
     const [getemail, setEmail] = React.useState('');
     
   const [formData, setFormData] = useState({
-    byemail: 'admin',
+    byemail: session?.data?.user?.email,
   name: '',
   cost: '',
   duration: '',
@@ -164,7 +164,7 @@ import { useSession } from "next-auth/react";
         description: formData.description,
         phone: formData.cost,
         duration: formData.duration,
-        byemail: formData.byemail,
+        byemail: session?.data?.user?.email,
       });
       setAlert("block");
       console.log('Document written with ID: ', docRef.id);

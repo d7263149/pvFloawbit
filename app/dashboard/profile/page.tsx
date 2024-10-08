@@ -31,7 +31,7 @@ import {
   import React from "react";
   import { db } from "../../../compnents/firebase"
 
-  import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+  import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { useSession } from "next-auth/react";
   
   
@@ -53,175 +53,61 @@ import { useSession } from "next-auth/react";
     );
   };
   
-  const AddUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-    // ========================================
-
-
-    const mainurl = process.env.NEXT_PUBLIC_URL;
-    const session:any = useSession();
-    const [alert, setAlert] = React.useState('none');
-    const [getemail, setEmail] = React.useState('');
-    
-  const [formData, setFormData] = useState({
-    byemail: 'admin',
-  name: '',
-  cost: '',
-  duration: '',
-  description: '',
-  });
-  
-  // Handle input changes
-  const handleChange = (e: { target: { id: any; value: any; }; }) => {
-  const { id, value } = e.target;
-  setFormData((prevData) => ({
-    ...prevData,
-    [id]: value
-  }));
-  };
-  
-  // Handle form submission
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-  e.preventDefault();
-  console.log('Form Data:', formData);
-  // Process or send formData to a server here
-  
-  try {
-      // Insert into Firestore
-      const docRef = await addDoc(collection(db, 'strexService'), {
-        name: formData.name,
-        description: formData.description,
-        phone: formData.cost,
-        duration: formData.duration,
-        byemail: formData.byemail,
-      });
-      setAlert("block");
-      console.log('Document written with ID: ', docRef.id);
-      // session.user.newid = 23;
-      // session.user.role = 'supplier';
-  
-  
-      setTimeout(function(){  
-        // window.location.href=mainurl+'/dashboard';
-        setOpen(false)
-       }, 2000);
-      
-     
-    } catch (e) {
-      console.error('Error adding document: ', e);
-    }
-    
-  };
-  
-    // ==========================
-    return (
-      <>
-        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-           Save
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen}>
-        <form onSubmit={handleSubmit} className="">
-          <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Add new Service</strong>
-          </Modal.Header>
-          <Modal.Body>
-          <Alert id="alert" style={{display:alert}} color="success">
-      <span className="font-medium">Info alert!</span> Successfully save
-    </Alert>
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="firstName">name</Label>
-                <div className="mt-1">
-                <TextInput id="name" type="text" value={formData.name}
-          onChange={handleChange} placeholder=""  required />
-                </div>
-              </div>
-              
-              
-              
-               <div>
-                <Label htmlFor="firstName">Cost</Label>
-                <div className="mt-1">
-                <TextInput id="cost" type="text" value={formData.cost}
-          onChange={handleChange} placeholder=""  required />
-                </div>
-              </div>
-
-
-              <div>
-                <Label htmlFor="firstName">Duration</Label>
-                <div className="mt-1">
-                <TextInput id="duration"     value={formData.duration}   onChange={handleChange} type="text" required />
-                </div>
-              </div>
-
-
-
-
-              <div className="mt-2">
-                <Label htmlFor="firstName">Description</Label>
-                <div className="mt-1">
-                <TextInput id="description"  value={formData.description}
-          onChange={handleChange} type="text" required />
-                </div>
-              </div>
-    
-         
-
-
-              </div>
-            
-   
-     
-    
-   
-      {/* <div className="flex items-center gap-2">
-        <Checkbox id="remember" />
-        <Label htmlFor="remember">Remember me</Label>
-      </div> */}
-    
-   
-          </Modal.Body>
-          <Modal.Footer>
-            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-              Add Service
-            </Button>
-          </Modal.Footer>
-          </form>
-        </Modal>
-      </>
-    );
-  };
+ 
   
   const AllUsersTable: FC = function () {
     const mainurl = process.env.NEXT_PUBLIC_URL;
     const session:any = useSession();
     const [alert, setAlert] = React.useState('none');
+    const [userId, setuserid] = useState('' as any);
     const [profile, setProfile] = useState({
         name: '',
         email1: '',
         age: '',
         city: ''
       });
+
+    //   const userId = 'ZHgZ9wwhUVadvOYQeISK'; // Replace with actual user ID or authentication logic
     
-      const userId = 'ZHgZ9wwhUVadvOYQeISK'; // Replace with actual user ID or authentication logic
+      useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                // Create a query to find the document where email matches
+                const q = query(collection(db, "strexSupplier"), where("email", "==",session?.data?.user?.email));
+                
+                // Execute the query
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                  // Loop through the results (there should only be one match if emails are unique)
+                  querySnapshot.forEach(async (doc) => {
+                    const docRef = doc.ref.id; // Get the document reference
+                    // Update the document with the new data
+                    setuserid(docRef);
+                    console.log('docRef',docRef);
+                    // await updateDoc(docRef, profile);
+                    // console.log("Document successfully updated!");
+                  });
+                } else {
+                  console.log("No document with the specified email.");
+                }
+              } catch (error) {
+                console.error("Error updating document: ", error);
+              }
+        };
+      if(session?.data?.user?.email){
+
+          fetchProfile();  
+      }
     
-      // Fetch the profile data from Firestore when the component mounts
-    //   useEffect(() => {
-    //     const fetchProfile = async () => {
-    //       const docRef = doc(db, 'strexSupplier', userId);
-    //       const docSnap = await getDoc(docRef);
-    //       console.log('docSnap',docSnap)
-    //       if (docSnap.exists()) {
-    //         setProfile(docSnap.data()); // Set profile data to state
-    //       }
-    //     };
-    
-    //     fetchProfile();
-    //   }, []);
+      }, [session?.data?.user?.email]);
+
+
+
+
+
+
+
 
       useEffect(() => {
         const fetchProfile = async () => {
@@ -242,7 +128,7 @@ import { useSession } from "next-auth/react";
         };
       
         fetchProfile();
-      }, []);
+      }, [userId]);
     
       // Handle input change
       const handleChange = (e: { target: { name: any; value: any; }; }) => {

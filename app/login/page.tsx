@@ -17,7 +17,7 @@ return(
        {/* <Header/> */}
        <div className="mt-[40px]">
        <div className="company-logo text-center">
-            <a href="https://perfexcrm.com/demo/" className="logo img-responsive">
+            <a href={mainurl} className="logo img-responsive">
         <img src="/images/black.png" style={{    height: '62px'}} className="img-responsive" alt=" CRM" />
         </a>        </div>
 
@@ -49,7 +49,7 @@ return(
    {/* <button onClick={()=>signIn('google')}>Login google </button> */}
    
      
-     <Button onClick={()=>signIn('google',{ callbackUrl: '/dashboard' })} type="submit">Google Login</Button>
+     <Button onClick={()=>signIn('google',{ callbackUrl: '/redirect' })} type="submit">Google Login</Button>
      <Button  color="dark" href={mainurl+'/register'}>Register</Button>
    </div>
  </Card>

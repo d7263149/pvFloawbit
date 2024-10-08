@@ -195,7 +195,7 @@ const ExampleSidebar: FC = function () {
         <div className="flex items-center logoimage">
             <Sidebar.Items >
             {/* https://perfexcrm.com/demo/uploads/company/b40f7c16311848152fa744df4fda30b2.png */}
-              <img alt="" src="/images/log.png" className="mr-3 h-6 sm:h-8" />
+            <img alt="" src="/images/logo.png" style={{    height: '62px', width: '100%'}} className="mr-3 h-6 sm:h-8" />
               <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
                 {/* Admin */}
               </span>

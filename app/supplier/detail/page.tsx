@@ -34,41 +34,8 @@ useEffect(() => {
 
 
 if (session) {
-  // Perform an API call to update session data on the server
-  // await fetch("/api/auth/session?update", {
-  //   method: "POST",
-  //   body: JSON.stringify({ role:123 }),
-  // });
-
-
-  // // Make a request to update the user profile in your database
-  // await fetch(mainurl+'/api/user/update-profile', {
-  //   method: 'POST',
-  //   body: JSON.stringify({}),
-  // });
-
-  // // After profile is updated, trigger a session update
-  // const updatedSession = await getSession();
-  // console.log('Updated session:', updatedSession);
-
-
-
-  const response = await fetch('/api/auth/update-session', {
-     method: 'POST' ,
-     body: JSON.stringify({ key: rolemain }),
-    });
-  const data1 = await response.json();
- if(data1?.session?.user?.role){
-  // update({role:'chams'});
-  const updateSession = await update({email: role});
-  console.log('doneeee')
+  const updateSession = await update({email: data?.[0]?.email,name: data?.[0]?.name,role: data?.[0]?.role});
   // window.location.href=mainurl+'/dashboard';
-  
- }
-
-
-  // Force the session to refresh
-  // await signOut({ callbackUrl: "/signin" }); // Optionally redirect
 }
 
 }
@@ -145,7 +112,7 @@ const [formData, setFormData] = useState({
     e.preventDefault();
     console.log('Form Data:', formData);
     // Process or send formData to a server here
-
+    
     try {
         // Insert into Firestore
         const docRef = await addDoc(collection(db, 'strexSupplier'), {
@@ -163,8 +130,9 @@ const [formData, setFormData] = useState({
         // session.user.role = 'supplier';
 
 
-        setTimeout(function(){  
-          // window.location.href=mainurl+'/dashboard';
+        setTimeout(async function(){  
+          await update({email: session?.data?.user?.email,name: session?.data?.user?.name,role: 'supplier'});
+          window.location.href=mainurl+'/dashboard';
          }, 2000);
         
        
@@ -180,22 +148,22 @@ const [formData, setFormData] = useState({
 
 
 
-  async function handleEdit() {
+//   async function handleEdit() {
         
-    // make a patch request to the endpint to update the user in database
+//     // make a patch request to the endpint to update the user in database
     
-    // update the session 
-    const updateSession = await update({email: "update@gmail.com",name: "sandeep",role: "supplier"});
-}
+//     // update the session 
+//     const updateSession = await update({email: "update@gmail.com",name: "sandeep",role: "supplier"});
+// }
 
 
   return (
     <main className="">
-        <button
+        {/* <button
                         onClick={handleEdit}
                     >
                         Edit detail
-                    </button>
+                    </button> */}
         {/* <Header/> */}
 
 {/* 

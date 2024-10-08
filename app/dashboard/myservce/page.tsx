@@ -135,7 +135,7 @@ import { useSession } from "next-auth/react";
     const [getemail, setEmail] = React.useState('');
     
   const [formData, setFormData] = useState({
-    byemail: 'admin',
+    byemail: session?.data?.user?.email,
   name: '',
   cost: '',
   duration: '',
@@ -154,6 +154,10 @@ import { useSession } from "next-auth/react";
   // Handle form submission
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
   e.preventDefault();
+  setFormData((prevData) => ({
+    ...prevData,
+    byemail: session?.data?.user?.email
+  }));
   console.log('Form Data:', formData);
   // Process or send formData to a server here
   
@@ -164,7 +168,7 @@ import { useSession } from "next-auth/react";
         description: formData.description,
         phone: formData.cost,
         duration: formData.duration,
-        byemail: formData.byemail,
+        byemail: session?.data?.user?.email,
       });
       setAlert("block");
       console.log('Document written with ID: ', docRef.id);
@@ -206,7 +210,7 @@ import { useSession } from "next-auth/react";
               <div>
                 <Label htmlFor="firstName">name</Label>
                 <div className="mt-1">
-                <TextInput id="name" type="text" value={formData.name}
+                <TextInput id="name" name="name" type="text" value={formData.name}
           onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
@@ -217,7 +221,7 @@ import { useSession } from "next-auth/react";
                 <Label htmlFor="firstName">Cost</Label>
                 <div className="mt-1">
                 <TextInput id="cost" type="text" value={formData.cost}
-          onChange={handleChange} placeholder=""  required />
+          onChange={handleChange} placeholder="" name="cost"  required />
                 </div>
               </div>
 
@@ -225,7 +229,7 @@ import { useSession } from "next-auth/react";
               <div>
                 <Label htmlFor="firstName">Duration</Label>
                 <div className="mt-1">
-                <TextInput id="duration"     value={formData.duration}   onChange={handleChange} type="text" required />
+                <TextInput id="duration" name="duration"    value={formData.duration}   onChange={handleChange} type="text" required />
                 </div>
               </div>
 
@@ -235,7 +239,15 @@ import { useSession } from "next-auth/react";
               <div className="mt-2">
                 <Label htmlFor="firstName">Description</Label>
                 <div className="mt-1">
-                <TextInput id="description"  value={formData.description}
+                <TextInput id="description" name="description"  value={formData.description}
+          onChange={handleChange} type="text" required />
+                </div>
+              </div>
+
+              <div className="mt-2" style={{display:'none'}}>
+                <Label htmlFor="firstName">Description</Label>
+                <div className="mt-1">
+                <TextInput id="description"  value={session?.data?.user?.email}
           onChange={handleChange} type="text" required />
                 </div>
               </div>
@@ -257,9 +269,15 @@ import { useSession } from "next-auth/react";
    
           </Modal.Body>
           <Modal.Footer>
-            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-              Add Service
-            </Button>
+            {session?.data?.user?.email
+            ?<Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
+            Add Service
+          </Button>:
+          <Button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
+          Loading
+        </Button>
+            }
+            
           </Modal.Footer>
           </form>
         </Modal>
