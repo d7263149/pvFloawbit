@@ -301,8 +301,8 @@ import { useSession } from "next-auth/react";
     
         return () => unSubscribe();
       }
-      
-    },[]);
+
+    },[session?.data?.user?.email]);
     
     
         return (
