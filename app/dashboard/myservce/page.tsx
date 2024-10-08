@@ -34,7 +34,7 @@ import {
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
 import { useSession } from "next-auth/react";
   
-const session = useSession();
+  
   const UserListPage: FC = function () {
     return (
       <NavbarSidebarLayout isFooter={false}>
@@ -130,6 +130,7 @@ const session = useSession();
 
 
     const mainurl = process.env.NEXT_PUBLIC_URL;
+    const session:any = useSession();
     const [alert, setAlert] = React.useState('none');
     const [getemail, setEmail] = React.useState('');
     
@@ -269,12 +270,12 @@ const session = useSession();
   const AllUsersTable: FC = function () {
     //@ts-ignore
     const [data, setDogs] = React.useState<Dog[]>([]);
-    
+    const session = useSession();
     useEffect(() => {
     
       // , where("mintType", "==", 'paid') 
       //  const dogsCol = query(collection(db, "strexService"), limit(10000));
-      const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(1000));
+         const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(1000));
       //  let dogsCol = collection(db, 'autoTopTrendingMints');
         const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
             const dogsArray = dogsSnap.docs.map(dogSnap => {
