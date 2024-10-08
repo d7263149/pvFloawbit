@@ -34,7 +34,7 @@ import {
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
 import { useSession } from "next-auth/react";
   
-  
+const session = useSession();
   const UserListPage: FC = function () {
     return (
       <NavbarSidebarLayout isFooter={false}>
@@ -130,7 +130,6 @@ import { useSession } from "next-auth/react";
 
 
     const mainurl = process.env.NEXT_PUBLIC_URL;
-    const session:any = useSession();
     const [alert, setAlert] = React.useState('none');
     const [getemail, setEmail] = React.useState('');
     
