@@ -18,11 +18,12 @@ return(
        <div className="mt-[40px]">
        <div className="company-logo text-center">
             <a href="https://perfexcrm.com/demo/" className="logo img-responsive">
-        <img src="https://perfexcrm.com/demo/uploads/company/1f03e41865e3e0d535f6202e5fba391a.png" className="img-responsive" alt="Perfex CRM" />
+
+            <img src="/images/black.png" style={{    height: '62px'}} className="img-responsive" alt=" CRM" />
         </a>        </div>
 
-       <h1 className="  tw-text-2xl tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-10">
-            Registeration        </h1>
+       <h2 style={{    fontSize: '22px'}} className="   tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-10">
+            Registeration        </h2>
 
    <Card className="max-w-sm  center-card1  mt-[20px]">
    <div className="flex flex-col gap-4">

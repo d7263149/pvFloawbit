@@ -10,29 +10,101 @@ import Header from '../../../compnents/header';
 import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
 import { useEffect } from "react";
 
-import {signOut, useSession} from 'next-auth/react'
+import {getSession, signOut, useSession} from 'next-auth/react'
 
 
 export default function Homed() {
   const mainurl = process.env.NEXT_PUBLIC_URL;
   const session:any = useSession();
-
+   const { update } = useSession();
+console.log('session',session)
 //@ts-ignore
 const [data, setDogs] = React.useState<Dog[]>([]);
 const [alert, setAlert] = React.useState('none');
 const [getemail, setEmail] = React.useState('');
+const [role, setRole] = React.useState('');
 
 
 useEffect(() => {
-    setEmail(session?.data?.user?.email);
-  }, [session?.data?.user?.email]);
+// console.log('working',getemail);
+// console.log('data',data?.[0]?.role)
+  async function mains(rolemain:any){
+
+
+
+
+if (session) {
+  // Perform an API call to update session data on the server
+  // await fetch("/api/auth/session?update", {
+  //   method: "POST",
+  //   body: JSON.stringify({ role:123 }),
+  // });
+
+
+  // // Make a request to update the user profile in your database
+  // await fetch(mainurl+'/api/user/update-profile', {
+  //   method: 'POST',
+  //   body: JSON.stringify({}),
+  // });
+
+  // // After profile is updated, trigger a session update
+  // const updatedSession = await getSession();
+  // console.log('Updated session:', updatedSession);
+
+
+
+  const response = await fetch('/api/auth/update-session', {
+     method: 'POST' ,
+     body: JSON.stringify({ key: rolemain }),
+    });
+  const data1 = await response.json();
+ if(data1?.session?.user?.role){
+  // update({role:'chams'});
+  const updateSession = await update({email: role});
+  console.log('doneeee')
+  // window.location.href=mainurl+'/dashboard';
+  
+ }
+
+
+  // Force the session to refresh
+  // await signOut({ callbackUrl: "/signin" }); // Optionally redirect
+}
+
+}
+console.log('data?.[0]?.role',data?.[0]?.role);
+if(data?.[0]?.role){
+   mains(data?.[0]?.role);
+}
+//
+
+
+  // async function updateProfile(newData) {
+  //   // Perform your update logic (e.g., API request to update user data)
+  
+  //   // Optionally refresh the session
+  //   const session = await getSession();
+  //   if (session) {
+  //     // Manually trigger a session update
+  //     await fetch("/api/auth/session?update", {
+  //       method: "POST",
+  //     });
+  //   }
+  // }
+
+
+
+  }, [data]);
 
 
 
 useEffect(() => {
-
+console.log('email ', session?.data?.user?.email)
   // , where("mintType", "==", 'paid') 
-   const dogsCol = query(collection(db, "strexService"), limit(10));
+  //  const dogsCol = query(collection(db, "strexSupplier"), where("email", "==", getemail));
+  if(session?.data?.user?.email){
+    setEmail(session?.data?.user?.email);
+  const dogsCol = query(collection(db, "strexSupplier"), where("email", "==", session?.data?.user?.email), limit(10));
   //  let dogsCol = collection(db, 'autoTopTrendingMints');
     const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
         const dogsArray = dogsSnap.docs.map(dogSnap => {
@@ -41,23 +113,13 @@ useEffect(() => {
             dog.id = dogSnap.id;
             return dog;
         });
-        // console.log('dogsArray1',dogsArray);
         setDogs(dogsArray)     
-
-        console.log(dogsArray);
-// setRowData(dogsArray)
-dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
-
-// setRowData(dogsArray)
-//       setRowDataold(dogsArray)
-
-// console.log('dogsArrayaftershort',dogsArray);
-
 
     });
 
     return () => unSubscribe();
-},[]);
+  }
+},[session?.data?.user?.email]);
 
 
 const [formData, setFormData] = useState({
@@ -98,11 +160,11 @@ const [formData, setFormData] = useState({
         setAlert("block");
         console.log('Document written with ID: ', docRef.id);
         // session.user.newid = 23;
-        session.user.role = 'supplier';
+        // session.user.role = 'supplier';
 
 
         setTimeout(function(){  
-          window.location.href=mainurl+'/dashboard';
+          // window.location.href=mainurl+'/dashboard';
          }, 2000);
         
        
@@ -118,12 +180,22 @@ const [formData, setFormData] = useState({
 
 
 
-
+  async function handleEdit() {
+        
+    // make a patch request to the endpint to update the user in database
+    
+    // update the session 
+    const updateSession = await update({email: "update@gmail.com",name: "sandeep",role: "supplier"});
+}
 
 
   return (
     <main className="">
-        
+        <button
+                        onClick={handleEdit}
+                    >
+                        Edit detail
+                    </button>
         {/* <Header/> */}
 
 {/* 

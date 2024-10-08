@@ -13,7 +13,7 @@ import {
   HiUsers,
   HiHome
 } from "react-icons/hi";
-
+import { signOut, useSession } from "next-auth/react";
 const ExampleSidebar: FC = function () {
   const [currentPage, setCurrentPage] = useState("");
 
@@ -22,9 +22,27 @@ const ExampleSidebar: FC = function () {
 
     setCurrentPage(newPage);
   }, [setCurrentPage]);
+  const session = useSession();
+  console.log('session1' , session)
+  const mainurl = process.env.NEXT_PUBLIC_URL;
 
-  return (
-    <Sidebar aria-label="Sidebar with multi-level dropdown example sidebarnew">
+
+
+
+
+
+
+
+
+
+
+
+
+
+//@ts-ignore
+  if (session?.data?.user?.role === 'supplier') {
+    return (
+      <Sidebar aria-label="Sidebar with multi-level dropdown example sidebarnew">
       <div className="flex h-full flex-col justify-between ">
         <div className="startdivsss">
 
@@ -33,7 +51,7 @@ const ExampleSidebar: FC = function () {
           
         <div className="flex items-center logoimage">
             <Sidebar.Items >
-              <img alt="" src="https://perfexcrm.com/demo/uploads/company/b40f7c16311848152fa744df4fda30b2.png" className="mr-3 h-6 sm:h-8" />
+            <img alt="" src="/images/logo.png" style={{    height: '62px', width: '100%'}} className="mr-3 h-6 sm:h-8" />
               <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
                 {/* Admin */}
               </span>
@@ -82,6 +100,151 @@ const ExampleSidebar: FC = function () {
               >
                 Products
               </Sidebar.Item> */}
+              
+              
+            
+              <Sidebar.Item
+                href="/dashboard/myservce"
+                icon={HiUsers}
+                className={
+                  "/dashboard/myservce" === currentPage
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : ""
+                }
+              >My Service List
+               
+              </Sidebar.Item>
+              <Sidebar.Item
+                href="/dashboard/serviceorder"
+                icon={HiUsers}
+                className={
+                  "/dashboard/serviceorder" === currentPage
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : ""
+                }
+              >
+               Service Order
+              </Sidebar.Item>
+              </Sidebar.ItemGroup>
+              {/* <Sidebar.ItemGroup>
+              <Sidebar.Item
+                href="/dashboard/myservce"
+                icon={HiUsers}
+                className={
+                  "/dashboard/myservce" === currentPage
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : ""
+                }
+              >My servce
+               
+              </Sidebar.Item>
+            </Sidebar.ItemGroup> */}
+            {/* <Sidebar.ItemGroup>
+              <Sidebar.Item
+                href="#"
+                icon={HiClipboard}
+              >
+                Docs
+              </Sidebar.Item>
+              <Sidebar.Item
+                href="#"
+                icon={HiCollection}
+              >
+                Components
+              </Sidebar.Item>
+              <Sidebar.Item
+                href="#"
+                icon={HiInformationCircle}
+              >
+                Help
+              </Sidebar.Item>
+            </Sidebar.ItemGroup> */}
+          </Sidebar.Items>
+        </div>
+      </div>
+    </Sidebar>
+    )
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if (session?.data?.user?.role === 'admin') {
+  return (
+    <Sidebar aria-label="Sidebar with multi-level dropdown example sidebarnew">
+      <div className="flex h-full flex-col justify-between ">
+        <div className="startdivsss">
+
+
+
+          
+        <div className="flex items-center logoimage">
+            <Sidebar.Items >
+            {/* https://perfexcrm.com/demo/uploads/company/b40f7c16311848152fa744df4fda30b2.png */}
+              <img alt="" src="/images/log.png" className="mr-3 h-6 sm:h-8" />
+              <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
+                {/* Admin */}
+              </span>
+            </Sidebar.Items>
+          </div>
+
+
+
+          <form className="pb-3 md:hidden">
+            <TextInput
+              icon={HiSearch}
+              type="search"
+              placeholder="Search"
+              required
+              size={32}
+            />
+          </form>
+          <Sidebar.Items>
+            <Sidebar.ItemGroup>
+              <Sidebar.Item
+                href="/dashboard"
+                icon={HiHome}
+                className={
+                  "/dashboard" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
+                }
+              >
+                Dashboard
+              </Sidebar.Item>
+              {/* <Sidebar.Item
+                href="/"
+                icon={HiChartPie}
+                className={
+                  "/" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
+                }
+              >
+                Website
+              </Sidebar.Item> */}
+              {/* <Sidebar.Item
+                href="/dashboard"
+                icon={HiShoppingBag}
+                className={
+                  "/dashboard" === currentPage
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : ""
+                }
+              >
+                Products
+              </Sidebar.Item> */}
+              
               <Sidebar.Item
                 href="/dashboard/supplier"
                 icon={HiUsers}
@@ -166,5 +329,6 @@ const ExampleSidebar: FC = function () {
     </Sidebar>
   );
 };
+}
 
 export default ExampleSidebar;

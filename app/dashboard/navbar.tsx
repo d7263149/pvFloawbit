@@ -61,14 +61,14 @@ const ExampleNavbar: FC = function () {
           arrowIcon={false}
           inline
           label={
-            <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+            <Avatar alt="User settings" img={session?.data?.user?.image? session?.data?.user?.image :"https://flowbite.com/docs/images/people/profile-picture-5.jpg"} rounded />
           }
         >
           <Dropdown.Header>
             <span className="block text-sm">{session?.data?.user?.name}</span>
             <span className="block truncate text-sm font-medium">{session?.data?.user?.email}</span>
           </Dropdown.Header>
-          <Dropdown.Item href="dashboard">Dashboard</Dropdown.Item>
+          <Dropdown.Item href={`${mainurl}/dashboard/profile`}>profile</Dropdown.Item>
           <Dropdown.Divider />
           <Dropdown.Item onClick={()=> signOut({ callbackUrl: mainurl })}>Sign out</Dropdown.Item>
         </Dropdown>

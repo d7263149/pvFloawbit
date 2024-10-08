@@ -31,86 +31,15 @@ import {
   import React from "react";
   import { db } from "../../../compnents/firebase"
 
-import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
+  import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useSession } from "next-auth/react";
   
   
   const UserListPage: FC = function () {
     return (
       <NavbarSidebarLayout isFooter={false}>
-        <div className="flex mb-4 .content">
-        <AddUserModal />
-        {/* <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-            Import Expenses
-          </div>
-        </Button> */}
-        </div>
-        <div className="block items-center justify-between border-b border-gray-200 bg-white  dark:border-gray-700 dark:bg-gray-800 sm:flex">
-          <div className="mb-1 w-full">
-            <div className="mb-4">
-              {/* <Breadcrumb className="mb-4">
-                <Breadcrumb.Item href="#">
-                  <div className="flex items-center gap-x-3">
-                    <HiHome className="text-xl" />
-                    <span className="dark:text-white">Home</span>
-                  </div>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item >Suplier</Breadcrumb.Item>
-                <Breadcrumb.Item>List</Breadcrumb.Item>
-              </Breadcrumb> */}
-              {/* <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                All Suplier
-              </h1> */}
-            </div>
-            <div className="sm:flex">
-              <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
-              
-                <div className="mt-3 flex space-x-1 pl-0 sm:mt-0 sm:pl-2">
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Configure</span>
-                    <HiCog className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Delete</span>
-                    <HiTrash className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Purge</span>
-                    <HiExclamationCircle className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Settings</span>
-                    <HiDotsVertical className="text-2xl" />
-                  </a>
-                </div>
-              </div>
-              <div className="ml-auto flex items-center space-x-2 sm:space-x-3">
-                
-                <Button color="gray">
-                  <div className="flex items-center gap-x-3">
-                    <HiDocumentDownload className="text-xl" />
-                    <span>Export</span>
-                  </div>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col">
+      
+        <div className="flex flex-col mt-2">
           <div className="overflow-x-auto">
             <div className="inline-block min-w-full align-middle">
               <div className="overflow-hidden shadow">
@@ -190,7 +119,7 @@ import { useSession } from "next-auth/react";
         <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
-            Add Service
+           Save
           </div>
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
@@ -268,125 +197,144 @@ import { useSession } from "next-auth/react";
   };
   
   const AllUsersTable: FC = function () {
-    //@ts-ignore
-    const [data, setDogs] = React.useState<Dog[]>([]);
-    const session = useSession();
-    useEffect(() => {
+    const mainurl = process.env.NEXT_PUBLIC_URL;
+    const session:any = useSession();
+    const [alert, setAlert] = React.useState('none');
+    const [profile, setProfile] = useState({
+        name: '',
+        email1: '',
+        age: '',
+        city: ''
+      });
     
-      // , where("mintType", "==", 'paid') 
+      const userId = 'ZHgZ9wwhUVadvOYQeISK'; // Replace with actual user ID or authentication logic
+    
+      // Fetch the profile data from Firestore when the component mounts
+    //   useEffect(() => {
+    //     const fetchProfile = async () => {
+    //       const docRef = doc(db, 'strexSupplier', userId);
+    //       const docSnap = await getDoc(docRef);
+    //       console.log('docSnap',docSnap)
+    //       if (docSnap.exists()) {
+    //         setProfile(docSnap.data()); // Set profile data to state
+    //       }
+    //     };
+    
+    //     fetchProfile();
+    //   }, []);
 
-if(session?.data?.user?.email){
-
-       const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(10));
-      //  let dogsCol = collection(db, 'autoTopTrendingMints');
-        const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
-            const dogsArray = dogsSnap.docs.map(dogSnap => {
-              //@ts-ignore
-                const dog = dogSnap.data() as Dog;
-                dog.id = dogSnap.id;
-                return dog;
-            });
-            // console.log('dogsArray1',dogsArray);
-            setDogs(dogsArray)     
+      useEffect(() => {
+        const fetchProfile = async () => {
+          try {
+            const docRef = doc(db, 'strexSupplier', userId); // Reference to the user's profile document
+            const docSnap = await getDoc(docRef); // Fetch the document
+      
+            if (docSnap.exists()) {
+                console.log('docSnap.data()',docSnap.data())
+                //@ts-ignore
+              setProfile(docSnap.data()); // Set profile data if the document exists
+            } else {
+              console.log("No such document!"); // Handle case where the document doesn't exist
+            }
+          } catch (error) {
+            console.error("Error fetching document: ", error); // Handle any errors that occur
+          }
+        };
+      
+        fetchProfile();
+      }, []);
     
-            console.log(dogsArray);
-    // setRowData(dogsArray)
-    dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
-    
-    // setRowData(dogsArray)
-    //       setRowDataold(dogsArray)
-    
-    // console.log('dogsArrayaftershort',dogsArray);
-    
-    
+      // Handle input change
+      const handleChange = (e: { target: { name: any; value: any; }; }) => {
+        setProfile({
+          ...profile,
+          [e.target.name]: e.target.value
         });
+      };
     
-        return () => unSubscribe();
-    }
-    },[session?.data?.user?.email]);
-    
+      // Save the profile to Firestore
+      const handleSave = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        const docRef = doc(db, 'strexSupplier', userId);
+        console.log('profile',profile)
+        await setDoc(docRef, profile);
+        setAlert('block')
+        console.log('Profile saved successfully!');
+      };
+  
+    // ==========================
     
         return (
-          <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600 ">
-            <Table.Head className="bg-gray-100 dark:bg-gray-700">
-              <Table.HeadCell>
-                <Label htmlFor="select-all" className="sr-only">
-                  Select all
-                </Label>
-                <Checkbox id="select-all" name="select-all" />
-              </Table.HeadCell>
-              <Table.HeadCell>Name</Table.HeadCell>
-              {/* <Table.HeadCell>email</Table.HeadCell> */}
-              {/* <Table.HeadCell>Country</Table.HeadCell> */}
-              <Table.HeadCell>Description</Table.HeadCell>
-              <Table.HeadCell>Duration</Table.HeadCell>
-              <Table.HeadCell>Cost</Table.HeadCell>
-              {/* <Table.HeadCell>By Email</Table.HeadCell> */}
-              <Table.HeadCell>Actions</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-    
-    
-    
-            {data.map(item => (
-              <Table.Row key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                <Table.Cell className="w-4 p-4">
-                  <div className="flex items-center">
-                    <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
-                    <label htmlFor="checkbox-1" className="sr-only">
-                      checkbox
-                    </label>
+            <form onSubmit={handleSave} className="">
+            <div className="border-b border-gray-200 !p-6 dark:border-gray-700">
+              <strong>Profile</strong>
+            </div>
+            <div>
+            <Alert id="alert" style={{display:alert}} color="success">
+        <span className="font-medium">Info alert!</span> Successfully save
+      </Alert>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="firstName">name</Label>
+                  <div className="mt-1">
+                  <TextInput id="name" name="name" type="text" value={profile.name}
+                  onChange={handleChange} placeholder=""  required />
                   </div>
-                </Table.Cell>
-                <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
+                </div>
                 
-                  <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    <div className="text-base font-semibold text-gray-900 dark:text-white">
-                    {item?.name}
-                    </div>
-                    <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    
-                    </div>
+                
+                
+                 <div>
+                  <Label htmlFor="firstName">Email</Label>
+                  <div className="mt-1">
+                  <TextInput id="cost" name="email1" type="text"  value={session?.data?.user?.email}
+                  onChange={handleChange} placeholder=""  required  readOnly/>
                   </div>
-                </Table.Cell>
-               
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                    
-                    {item?.description}
+                </div>
+  
+  
+                <div>
+                  <Label htmlFor="firstName">Age</Label>
+                  <div className="mt-1">
+                  <TextInput id="duration"      name="age"
+                  value={profile.age}
+                  onChange={handleChange} type="text" required />
                   </div>
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                    
-                    {item?.duration}
+                </div>
+  
+  
+  
+  
+                <div className="mt-2">
+                  <Label htmlFor="firstName">City</Label>
+                  <div className="mt-1">
+                  <TextInput id="description" name="city"   value={profile.city}
+                  onChange={handleChange} type="text" required />
                   </div>
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                    
-                    {item?.cost}
-                  </div>
-                </Table.Cell>
-                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                    
-                    {item?.byemail}
-                  </div>
-                </Table.Cell> */}
-                <Table.Cell>
-                  <div className="flex items-center gap-x-3 whitespace-nowrap">
-                    <EditUserModal />
-                    <DeleteUserModal />
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-              ))}
-             
-             
+                </div>
+      
+           
+  
+  
+                </div>
               
-            </Table.Body>
-          </Table>
+     
+       
+      
+     
+        {/* <div className="flex items-center gap-2">
+          <Checkbox id="remember" />
+          <Label htmlFor="remember">Remember me</Label>
+        </div> */}
+      
+     
+            </div>
+            <div>
+              <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
+                Save
+              </Button>
+            </div>
+            </form>
         );
       };
       
