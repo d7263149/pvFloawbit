@@ -274,6 +274,7 @@ import { useSession } from "next-auth/react";
     useEffect(() => {
     
       // , where("mintType", "==", 'paid') 
+      // const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(1000));
        const dogsCol = query(collection(db, "strexService"), limit(10000));
       //  let dogsCol = collection(db, 'autoTopTrendingMints');
         const unSubscribe = onSnapshot(dogsCol, dogsSnap => {

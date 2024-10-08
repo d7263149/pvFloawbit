@@ -154,10 +154,6 @@ import { useSession } from "next-auth/react";
   // Handle form submission
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
   e.preventDefault();
-  setFormData((prevData) => ({
-    ...prevData,
-    byemail: session?.data?.user?.email
-  }));
   console.log('Form Data:', formData);
   // Process or send formData to a server here
   
@@ -210,7 +206,7 @@ import { useSession } from "next-auth/react";
               <div>
                 <Label htmlFor="firstName">name</Label>
                 <div className="mt-1">
-                <TextInput id="name" name="name" type="text" value={formData.name}
+                <TextInput id="name" type="text" value={formData.name}
           onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
@@ -221,7 +217,7 @@ import { useSession } from "next-auth/react";
                 <Label htmlFor="firstName">Cost</Label>
                 <div className="mt-1">
                 <TextInput id="cost" type="text" value={formData.cost}
-          onChange={handleChange} placeholder="" name="cost"  required />
+          onChange={handleChange} placeholder=""  required />
                 </div>
               </div>
 
@@ -229,7 +225,7 @@ import { useSession } from "next-auth/react";
               <div>
                 <Label htmlFor="firstName">Duration</Label>
                 <div className="mt-1">
-                <TextInput id="duration" name="duration"    value={formData.duration}   onChange={handleChange} type="text" required />
+                <TextInput id="duration"     value={formData.duration}   onChange={handleChange} type="text" required />
                 </div>
               </div>
 
@@ -239,15 +235,7 @@ import { useSession } from "next-auth/react";
               <div className="mt-2">
                 <Label htmlFor="firstName">Description</Label>
                 <div className="mt-1">
-                <TextInput id="description" name="description"  value={formData.description}
-          onChange={handleChange} type="text" required />
-                </div>
-              </div>
-
-              <div className="mt-2" style={{display:'none'}}>
-                <Label htmlFor="firstName">Description</Label>
-                <div className="mt-1">
-                <TextInput id="description"  value={session?.data?.user?.email}
+                <TextInput id="description"  value={formData.description}
           onChange={handleChange} type="text" required />
                 </div>
               </div>
@@ -269,15 +257,9 @@ import { useSession } from "next-auth/react";
    
           </Modal.Body>
           <Modal.Footer>
-            {session?.data?.user?.email
-            ?<Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-            Add Service
-          </Button>:
-          <Button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-          Loading
-        </Button>
-            }
-            
+            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
+              Add Service
+            </Button>
           </Modal.Footer>
           </form>
         </Modal>
@@ -288,14 +270,12 @@ import { useSession } from "next-auth/react";
   const AllUsersTable: FC = function () {
     //@ts-ignore
     const [data, setDogs] = React.useState<Dog[]>([]);
-    const session = useSession();
+    
     useEffect(() => {
     
       // , where("mintType", "==", 'paid') 
-
-if(session?.data?.user?.email){
-
-       const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(10));
+      //  const dogsCol = query(collection(db, "strexService"), limit(10000));
+      const dogsCol = query(collection(db, "strexService"), where("byemail", "==", session?.data?.user?.email), limit(1000));
       //  let dogsCol = collection(db, 'autoTopTrendingMints');
         const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
             const dogsArray = dogsSnap.docs.map(dogSnap => {
@@ -320,8 +300,7 @@ if(session?.data?.user?.email){
         });
     
         return () => unSubscribe();
-    }
-    },[session?.data?.user?.email]);
+    },[]);
     
     
         return (
@@ -339,7 +318,7 @@ if(session?.data?.user?.email){
               <Table.HeadCell>Description</Table.HeadCell>
               <Table.HeadCell>Duration</Table.HeadCell>
               <Table.HeadCell>Cost</Table.HeadCell>
-              {/* <Table.HeadCell>By Email</Table.HeadCell> */}
+              <Table.HeadCell>By Email</Table.HeadCell>
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
@@ -386,12 +365,12 @@ if(session?.data?.user?.email){
                     {item?.cost}
                   </div>
                 </Table.Cell>
-                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
                   <div className="flex items-center">
                     
                     {item?.byemail}
                   </div>
-                </Table.Cell> */}
+                </Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center gap-x-3 whitespace-nowrap">
                     <EditUserModal />
