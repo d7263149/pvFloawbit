@@ -120,8 +120,20 @@ body{
     min-height: 100%;
 }
 #wrapper main {
-    padding: 30px;
+    padding: 30px 10px;
     min-width: 320px;
+}
+.customtable{
+    text-align: left;
+}
+.white{
+    color: white;
+}
+.white-bg{
+    background-color: white;
+}
+border-r{
+    border-radius: 5px;
 }
 /* //////////admin css/////////////////////// */
  
