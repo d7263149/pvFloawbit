@@ -609,7 +609,7 @@ const [users, setUsers] = useState<User[]>([]);
                     {role.name}
                   </option>
                 ))}
-              </select>
+              </select> 
             </div>
 
             <div className="mb-4">
