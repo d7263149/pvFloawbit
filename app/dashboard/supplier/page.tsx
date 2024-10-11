@@ -39,7 +39,7 @@ import {
 //   ---------------------------------------------------------
 
 // import React, { useEffect, useState } from 'react';
-import { useTable, useSortBy, usePagination, useGlobalFilter } from 'react-table';
+import { useTable, useSortBy, usePagination, useGlobalFilter, Row } from 'react-table';
 // import { db } from './firebase'; // Import your Firebase configuration
 import {
   collection,
@@ -586,13 +586,7 @@ const availableUsers = users.filter(user =>
     ))}
   </thead>
   <tbody {...getTableBodyProps()}>
-            {page.map((row: Row<{
-                roleName: string; id: string; name: string; email: string; // Added email field
-                // Added email field
-                roleId: string; phone: string; address: string; password: string; // Added password field
-                // Added password field
-                status: string; // Added status field
-              }>) => {
+            {page.map((row: Row<Supplier>) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()}  className={"hover:bg-gray-100 row"+row.id} key={row?.id}>
