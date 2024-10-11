@@ -31,18 +31,61 @@ import {
   import React from "react";
   import { db } from "../../../compnents/firebase"
 
-  import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
+//   import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
   
   import {signOut, useSession} from 'next-auth/react'
 
-  
-  
+
+//   ---------------------------------------------------------
+
+// import React, { useEffect, useState } from 'react';
+import { useTable, useSortBy, usePagination, useGlobalFilter } from 'react-table';
+// import { db } from './firebase'; // Import your Firebase configuration
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  QuerySnapshot,
+  DocumentData,
+} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Supplier interface
+interface Supplier {
+  id: string;
+  companyName: string;
+  contact: string;
+  phone: string;
+  address: string;
+  email: string;
+  description: string;
+  userId: string; // Reference to strexUsers
+}
+
+// User interface with role field
+interface User {
+  id: string;
+  name: string;
+  roleId: string; // Include roleId to match against strexRoles
+}
+
+interface Role {
+  id: string;
+  name: string;
+}
+
+//   ===============================================
   const UserListPage: FC = function () {
     const mainurl = process.env.NEXT_PUBLIC_URL;
     const session:any = useSession();
     const [alert, setAlert] = React.useState('none');
     const [getemail, setEmail] = React.useState('');
-    
+    const [selectedOption, setSelectedOption] = useState('');
+
 const [formData, setFormData] = useState({
   company: '',
   contact: '',
@@ -69,7 +112,7 @@ const handleSubmit = async (e: { preventDefault: () => void; }) => {
 
   try {
       // Insert into Firestore
-      const docRef = await addDoc(collection(db, 'strexSupplier'), {
+      const docRef = await addDoc(collection(db, 'strexUsers'), {
           company: formData.company,
         description: formData.description,
         contact: formData.contact,
@@ -96,525 +139,592 @@ const handleSubmit = async (e: { preventDefault: () => void; }) => {
 };
 
 
+//   [[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]
+const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+const [users, setUsers] = useState<User[]>([]); // Store users from strexUsers
+const [roles, setRoles] = useState<Role[]>([]); // Store roles from strexRoles
+const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+const [isEditing, setIsEditing] = useState<boolean>(false);
+const [showSearch, setShowSearch] = useState<boolean>(false); // State for search box
+const [pageSize, setPageSize] = useState<number>(10); // State for page size
+const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
+const [newSupplierData, setNewSupplierData] = useState<Omit<Supplier, 'id'>>({
+  companyName: '',
+  contact: '',
+  phone: '',
+  address: '',
+  email: '',
+  description: '',
+  userId: '', // UserId reference
+});
+const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+const [supplierToDelete, setSupplierToDelete] = useState<string | null>(null);
+const [supplierRoleId, setSupplierRoleId] = useState<string | null>(null); // Role ID for Supplier
+
+// Fetch suppliers, users, and roles from Firebase
+useEffect(() => {
+  const fetchData = async () => {
+    // Fetch roles from strexRoles collection
+    const rolesCollection = collection(db, 'strexRoles');
+    const rolesDocs: QuerySnapshot<DocumentData> = await getDocs(rolesCollection);
+    const rolesData: Role[] = rolesDocs.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+    }));
+    setRoles(rolesData);
+
+    // Find Supplier role ID
+    const supplierRole = rolesData.find(role => role.name === 'supplier');
+    if (supplierRole) {
+      setSupplierRoleId(supplierRole.id); // Store the Supplier role ID
+    }
+
+    // Fetch users from strexUsers collection
+    const usersCollection = collection(db, 'strexUsers');
+    const userDocs: QuerySnapshot<DocumentData> = await getDocs(usersCollection);
+    const usersData: User[] = userDocs.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      roleId: doc.data().roleId, // Get the roleId of the user
+    }));
+    setUsers(usersData);
+
+    // Fetch suppliers from strexSuppliers collection
+    const suppliersCollection = collection(db, 'strexSuppliers');
+    const supplierDocs: QuerySnapshot<DocumentData> = await getDocs(suppliersCollection);
+    const suppliersData: Supplier[] = supplierDocs.docs.map(doc => ({
+      id: doc.id,
+      companyName: doc.data().companyName,
+      contact: doc.data().contact,
+      phone: doc.data().phone,
+      address: doc.data().address,
+      email: doc.data().email,
+      description: doc.data().description,
+      userId: doc.data().userId, // UserId reference
+    }));
+    setSuppliers(suppliersData);
+  };
+
+  fetchData();
+}, []);
+
+// Toggle Modal
+const toggleModal = () => {
+  setIsModalOpen(prev => !prev);
+  if (isModalOpen) {
+    resetForm();
+  }
+};
+
+const resetForm = () => {
+  setNewSupplierData({
+    companyName: '',
+    contact: '',
+    phone: '',
+    address: '',
+    email: '',
+    description: '',
+    userId: '', // Reset the userId
+  });
+  setIsEditing(false);
+  setSelectedSupplierId(null);
+};
+
+// Add Supplier
+const handleAddSupplier = async () => {
+  if (newSupplierData.companyName && newSupplierData.userId) {
+    const supplierData: Supplier = {
+      id: '',
+      ...newSupplierData,
+    };
+
+    // Ensure the user does not have another supplier assigned
+    const assignedSupplier = suppliers.find(supplier => supplier.userId === newSupplierData.userId);
+    if (assignedSupplier) {
+      toast.error('This user already has a supplier assigned!');
+      return;
+    }
+
+    const docRef = await addDoc(collection(db, 'strexSuppliers'), supplierData);
+    setSuppliers([...suppliers, { ...supplierData, id: docRef.id }]);
+    toast.success('Supplier added successfully!');
+    toggleModal();
+  }
+};
+
+// Edit Supplier
+const handleEditSupplier = async () => {
+  if (selectedSupplierId && newSupplierData.userId) {
+    // Ensure the user does not have another supplier assigned
+    const assignedSupplier = suppliers.find(supplier => supplier.userId === newSupplierData.userId && supplier.id !== selectedSupplierId);
+    if (assignedSupplier) {
+      toast.error('This user already has a supplier assigned!');
+      return;
+    }
+
+    await updateDoc(doc(db, 'strexSuppliers', selectedSupplierId), newSupplierData);
+    setSuppliers(suppliers.map(supplier => (supplier.id === selectedSupplierId ? { ...supplier, ...newSupplierData } : supplier)));
+    toast.success('Supplier updated successfully!');
+    toggleModal();
+  }
+};
+
+// Open delete confirmation
+const openDeleteConfirm = (supplierId: string) => {
+  setSupplierToDelete(supplierId);
+  setIsDeleteConfirmOpen(true);
+};
+
+// Delete Supplier
+const handleDeleteSupplier = async () => {
+  if (supplierToDelete) {
+    await deleteDoc(doc(db, 'strexSuppliers', supplierToDelete));
+    setSuppliers(suppliers.filter(supplier => supplier.id !== supplierToDelete));
+    toast.success('Supplier deleted successfully!');
+    setIsDeleteConfirmOpen(false);
+    setSupplierToDelete(null);
+  }
+};
+
+// Handle input change
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setNewSupplierData(prevState => ({
+    ...prevState,
+    [name]: value,
+  }));
+};
+
+// Prepare data for react-table
+const data = React.useMemo(() => suppliers, [suppliers]);
+
+// Define table columns
+const columns = React.useMemo(
+  () => [
+    { Header: 'Company Name', accessor: 'companyName' },
+    { Header: 'Contact', accessor: 'contact' },
+    { Header: 'Phone', accessor: 'phone' },
+    { Header: 'Address', accessor: 'address' },
+    { Header: 'Email', accessor: 'email' },
+    { Header: 'Description', accessor: 'description' },
+    {
+      Header: 'Assigned User',
+      accessor: 'userId',
+      Cell: ({ value }: { value: string }) => users.find(user => user.id === value)?.name || 'Unassigned',
+    },
+    {
+      Header: 'Actions',
+      Cell: ({ row }: { row: { original: Supplier } }) => (
+        <div className="flex space-x-2">
+          <button
+            className="text-blue-500 hover:text-blue-600"
+            onClick={() => {
+              setNewSupplierData({
+                companyName: row.original.companyName,
+                contact: row.original.contact,
+                phone: row.original.phone,
+                address: row.original.address,
+                email: row.original.email,
+                description: row.original.description,
+                userId: row.original.userId,
+              });
+              setSelectedSupplierId(row.original.id);
+              setIsEditing(true);
+              toggleModal();
+            }}
+          >
+           <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l6.105-6.104a2 2 0 00-2.828-2.828l-6.105 6.104a3 3 0 00-1.568.723l-4.44 4.44a2 2 0 00-.464.706l-1.23 3.691a1 1 0 001.245 1.246l3.691-1.23a2 2 0 00.706-.464l4.44-4.44a3 3 0 00.723-1.568z" />
+              </svg>
+          </button>
+          <button
+            className="text-red-500 hover:text-red-600"
+            onClick={() => openDeleteConfirm(row.original.id)}
+          >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+          </button>
+        </div>
+      ),
+    },
+  ],
+  [suppliers, users]
+);
+
+// useTable hooks
+// const {
+//   getTableProps,
+//   getTableBodyProps,
+//   headerGroups,
+//   rows,
+//   prepareRow,
+//   page,
+//   state: { pageIndex, pageSize },
+//   canPreviousPage,
+//   canNextPage,
+//   previousPage,
+//   nextPage,
+//   setPageSize,//@ts-ignore
+//   setGlobalFilter, //@ts-ignore
+// } = useTable(
+//   {
+//     columns,
+//     data,
+//     initialState: { pageSize: 10 },
+//   },
+//   useGlobalFilter,
+//   useSortBy,
+//   usePagination
+// );
+
+
+const {
+  getTableProps,
+  getTableBodyProps,
+  headerGroups,
+  rows,
+  prepareRow, //@ts-ignore
+  page, //@ts-ignore
+  canPreviousPage, //@ts-ignore
+  canNextPage, //@ts-ignore
+  pageOptions, //@ts-ignore
+  gotoPage, //@ts-ignore
+  nextPage, //@ts-ignore
+  previousPage, //@ts-ignore
+  setGlobalFilter, //@ts-ignore
+  state: { pageIndex, globalFilter },
+} = useTable(
+  { //@ts-ignore
+    columns,
+    data, //@ts-ignore
+    initialState: { pageIndex: 0, pageSize: 10 }, // Set initial page index and page size
+  },
+  useGlobalFilter, // Search
+  useSortBy, // Sorting
+  usePagination // Pagination
+);
+
+// Get available users who are not already assigned and have the Supplier role
+console.log('users',users);
+const availableUsers = users.filter(user => 
+  user.roleId === supplierRoleId && !suppliers.some(supplier => supplier.userId === user.id)
+);
+
+    // [[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]
+
+
+
+
+
+
+
+
+
+
     return (
       <NavbarSidebarLayout isFooter={false}>
-        <div className="flex mb-4 .content">
-        <AddUserModal />
-        {/* <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-            Import Expenses
-          </div>
-        </Button> */}
+      <div className="flex mb-4 .content  ">
+      {/* <AddUserModal /> */}
+      <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"  onClick={() => {
+          resetForm();
+          toggleModal();
+        }}>
+        <div className="flex items-center gap-x-3">
+          <HiPlus className="text-xl" />
+          Add Supplier
         </div>
-        <div className="block items-center justify-between border-b border-gray-200 bg-white  dark:border-gray-700 dark:bg-gray-800 sm:flex">
-          <div className="mb-1 w-full">
-            <div className="mb-4">
-              {/* <Breadcrumb className="mb-4">
-                <Breadcrumb.Item href="#">
-                  <div className="flex items-center gap-x-3">
-                    <HiHome className="text-xl" />
-                    <span className="dark:text-white">Home</span>
-                  </div>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item >Suplier</Breadcrumb.Item>
-                <Breadcrumb.Item>List</Breadcrumb.Item>
-              </Breadcrumb> */}
-              {/* <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                All Suplier
-              </h1> */}
-            </div>
-            <div className="sm:flex">
-              <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
+      </Button>
+      {/* <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+        <div className="flex items-center gap-x-3">
+          <HiPlus className="text-xl" />
+          Import Expenses
+        </div>
+      </Button> */}
+      </div>
+  
+
+
+
+
+
+
+
+
+{/* ---------------------------- */}
+
+<div className=" mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg	">
+{/* <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold">User Management</h2>
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={() => {
+            resetForm();
+            toggleModal();
+          }}
+        >
+          Add User
+        </button>
+      </div> */}
+
+<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
+{/* Top Toolbar */}
+<div className="flex justify-between items-center mb-4">
+  {/* Left side: Number of rows dropdown */}
+  <div className="flex items-center space-x-2">
+    <label className="text-sm font-medium">Show</label>
+    <select
+      className="border border-gray-300 rounded-md p-1"
+      value={pageSize}
+      onChange={e => setPageSize(Number(e.target.value))}
+    >
+      {[10, 25, 50].map(size => (
+        <option key={size} value={size}>
+          {size}
+        </option>
+      ))}
+    </select>
+    <label className="text-sm font-medium">entries</label>
+  </div>
+
+  {/* Right side: Search box */}
+  <div className="relative"  style={{marginTop: '-33px'
+        }}>
+    {/* <button onClick={() => setShowSearch(prev => !prev)} className="text-gray-500 hover:text-gray-600">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-5.5 5.5m-1.25-1.25a6 6 0 118.5 0l-1.25 1.25M10.5 5.5a6 6 0 118.5 8.5" />
+      </svg>
+      
+    </button> */}
+     
+     <input
+        type="text"
+        className="absolute top-0 right-0 w-20 md:w-40  border border-gray-300 rounded-md p-1 transition-all duration-300"
+        value={globalFilter || ''}
+        onChange={e => setGlobalFilter(e.target.value)}
+        placeholder="Search"
+        onFocus={(e) => e.target.classList.add('w-40')}
+       
+      />
+
+    {showSearch && (
+      <input
+        type="text"
+        className="absolute top-0 right-0 w-20 md:w-40 mt-2 border border-gray-300 rounded-md p-1 transition-all duration-300"
+        value={globalFilter || ''}
+        onChange={e => setGlobalFilter(e.target.value)}
+        placeholder="Search"
+        onFocus={(e) => e.target.classList.add('w-40')}
+      />
+    )}
+  </div>
+</div>
+
+
+
+{/* 
+ <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroup.headers.map(column => (
+          <th {...column.getHeaderProps()} className="border-b p-2 text-left">
+            {column.render('Header')}
+          </th>
+        ))}
+      </tr> */}
+  {/* <tbody {...getTableBodyProps()}>
+    {page.map(row => {
+      prepareRow(row);
+      return (
+        <tr {...row.getRowProps()} className="border-b hover:bg-gray-100">
+          {row.cells.map(cell => (
+            <td {...cell.getCellProps()} className="p-2">
+              {cell.render('Cell')}
+            </td>
+          ))}
+        </tr>
+      );
+    })}
+  </tbody> */}
+
+
+{/* Table */}
+<div className="relative overflow-x-auto border rounded-lg">
+<table {...getTableProps()} className="min-w-full leading-normal">
+  <thead>
+    {headerGroups.map(headerGroup => (
+        <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup?.id}>
+        {headerGroup.headers.map(column => ( //@ts-ignore
+          <th //@ts-ignore
+            {...column.getHeaderProps(column.getSortByToggleProps())}
+            className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"  key={column?.id}
+          >
+            {column.render('Header') }
+            <span>{ 
+             //@ts-ignore
+            column.isSorted ? (column.isSortedDesc ? ' ▼' : ' ▲') : ''}</span>
+          </th>
+        ))}
+      </tr>
+    ))}
+  </thead>
+  <tbody {...getTableBodyProps()}>
+            {page.map((row: Row<{
+                roleName: string; id: string; name: string; email: string; // Added email field
+                // Added email field
+                roleId: string; phone: string; address: string; password: string; // Added password field
+                // Added password field
+                status: string; // Added status field
+              }>) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}  className={"hover:bg-gray-100 row"+row.id} key={row?.id}>
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm" key={row?.id}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+</table>
+</div>
+
+{/* Pagination */}
+<div className="flex justify-between items-center mt-4">
+  <div>
+    <span>
+      Showing {page.length} of {suppliers.length} entries
+    </span>
+  </div>
+  <div className="flex space-x-2">
+    <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+      Previous
+    </button>
+    <button onClick={() => nextPage()} disabled={!canNextPage}>
+      Next
+    </button>
+  </div>
+</div>
+
+{/* Modal for Add/Edit Supplier */}
+{isModalOpen && (
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
+      {/* <h2 className="text-xl mb-4">{isEditing ? 'Edit Supplier' : 'Add Supplier'}</h2> */}
+      <h3 className="text-lg font-semibold mb-4">{isEditing ? 'Edit Supplier' : 'Add Supplier'}</h3>
+      <form onSubmit={e => { e.preventDefault(); isEditing ? handleEditSupplier() : handleAddSupplier(); }}>
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">company Name</label>
+              <input type="text" name="companyName" value={newSupplierData.companyName} onChange={handleInputChange} placeholder="Company Name" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+      </div>
+
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">contact</label>
+              <input type="text" name="contact" value={newSupplierData.contact} onChange={handleInputChange} placeholder="Contact" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+      </div>
+
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">phone</label>
+              <input type="text" name="phone" value={newSupplierData.phone} onChange={handleInputChange} placeholder="Phone" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+      
+      </div>
+
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Address</label>
+              <input type="text" name="address" value={newSupplierData.address} onChange={handleInputChange} placeholder="Address" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+      </div>
+
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input type="email" name="email" value={newSupplierData.email} onChange={handleInputChange} placeholder="Email" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+
+      </div>
+
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea name="description" value={newSupplierData.description} onChange={handleInputChange} placeholder="Description" required className="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+      </div>
+      <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">User</label>
+              <select name="userId" value={newSupplierData.userId} onChange={handleInputChange} required className="mt-1 block w-full border border-gray-300 rounded-md p-2">
+          <option value="" disabled>Select User</option>
+          {availableUsers.map(user => (
+            <option key={user.id} value={user.id}>{user.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex justify-end">
+              <button
+                className="bg-gray-300 hover:bg-gray-400 text-white px-4 py-2 rounded mr-2"
+                onClick={toggleModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
               
-                <div className="mt-3 flex space-x-1 pl-0 sm:mt-0 sm:pl-2">
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Configure</span>
-                    <HiCog className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Delete</span>
-                    <HiTrash className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Purge</span>
-                    <HiExclamationCircle className="text-2xl" />
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    <span className="sr-only">Settings</span>
-                    <HiDotsVertical className="text-2xl" />
-                  </a>
-                </div>
-              </div>
-              <div className="ml-auto flex items-center space-x-2 sm:space-x-3">
-                
-                <Button color="gray">
-                  <div className="flex items-center gap-x-3">
-                    <HiDocumentDownload className="text-xl" />
-                    <span>Export</span>
-                  </div>
-                </Button>
-              </div>
+              >
+                {isEditing ? 'Update Supplier' : 'Add Supplier'}
+              </button>
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <div className="overflow-x-auto">
-            <div className="inline-block min-w-full align-middle">
-              <div className="overflow-hidden shadow">
-                <AllUsersTable />
-              </div>
-            </div>
-          </div>
-        </div>
+        
+        
+        
+        
+        {/* <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">
+          {isEditing ? 'Update Supplier' : 'Add Supplier'}
+        </button> */}
+      </form>
+      {/* <button onClick={toggleModal} className="mt-4 text-red-500">Cancel</button> */}
+    </div>
+  </div>
+)}
+
+{/* Delete Confirmation Modal */}
+{isDeleteConfirmOpen && (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
+      <h2 className="text-xl mb-4">Confirm Deletion</h2>
+      <p>Are you sure you want to delete this supplier?</p>
+      <div className="flex justify-between mt-4">
+        <button onClick={handleDeleteSupplier} className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+        <button onClick={() => setIsDeleteConfirmOpen(false)} className="text-gray-500 border px-4 py-2 rounded">Cancel</button>
+      </div>
+    </div>
+  </div>
+)}
+
+<ToastContainer />
+</div>
+        {/* ----------------------------- */}
         {/* <Pagination /> */}
       </NavbarSidebarLayout>
     );
   };
   
-  const AddUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  // ========================================
 
-
-  const mainurl = process.env.NEXT_PUBLIC_URL;
-  const session:any = useSession();
-  const [alert, setAlert] = React.useState('none');
-  const [getemail, setEmail] = React.useState('');
   
-const [formData, setFormData] = useState({
-company: '',
-contact: '',
-phone: '',
-address: '',
-email: getemail,
-description: '',
-});
 
-// Handle input changes
-const handleChange = (e: { target: { id: any; value: any; }; }) => {
-const { id, value } = e.target;
-setFormData((prevData) => ({
-  ...prevData,
-  [id]: value
-}));
-};
-
-// Handle form submission
-const handleSubmit = async (e: { preventDefault: () => void; }) => {
-e.preventDefault();
-console.log('Form Data:', formData);
-// Process or send formData to a server here
-
-try {
-    // Insert into Firestore
-    const docRef = await addDoc(collection(db, 'strexSupplier'), {
-        company: formData.company,
-      description: formData.description,
-      contact: formData.contact,
-      phone: formData.phone,
-      address: formData.address,
-      email: formData.email,
-      role: 'supplier',
-    });
-    setAlert("block");
-    console.log('Document written with ID: ', docRef.id);
-    // session.user.newid = 23;
-    // session.user.role = 'supplier';
-
-
-    setTimeout(function(){  
-      // window.location.href=mainurl+'/dashboard';
-      setOpen(false)
-     }, 2000);
-    
-   
-  } catch (e) {
-    console.error('Error adding document: ', e);
-  }
-  
-};
-
-  // ==========================
-    return (
-      <>
-        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-            Add Supplier
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen}>
-        <form onSubmit={handleSubmit} className="">
-          <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Add new Supplier</strong>
-          </Modal.Header>
-          <Modal.Body>
-          <Alert id="alert" style={{display:alert}} color="success">
-      <span className="font-medium">Info alert!</span> Successfully save
-    </Alert>
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="firstName">company</Label>
-                <div className="mt-1">
-                <TextInput id="company" type="text" value={formData.company}
-          onChange={handleChange} placeholder=""  required />
-                </div>
-              </div>
-              
-              
-              
-               <div>
-                <Label htmlFor="firstName">Contact</Label>
-                <div className="mt-1">
-                <TextInput id="contact" type="text" value={formData.contact}
-          onChange={handleChange} placeholder=""  required />
-                </div>
-              </div>
-
-
-              <div>
-                <Label htmlFor="firstName">Phone</Label>
-                <div className="mt-1">
-                <TextInput id="phone"     value={formData.phone}   onChange={handleChange} type="text" required />
-                </div>
-              </div>
-
-
-
-
-              <div>
-                <Label htmlFor="firstName">Email</Label>
-                <div className="mt-1">
-                <TextInput id="email"  value={formData.email}
-          onChange={handleChange} type="text" required  />
-                </div>
-              </div>
-
-
-            
-
-
-         
-
-
-              </div>
-              <div className="mt-2">
-                <Label htmlFor="firstName">Description</Label>
-                <div className="mt-1">
-                <TextInput id="description"  value={formData.description}
-          onChange={handleChange} type="text" required />
-                </div>
-              </div>
-   
-     
-    
-   
-      {/* <div className="flex items-center gap-2">
-        <Checkbox id="remember" />
-        <Label htmlFor="remember">Remember me</Label>
-      </div> */}
-    
-   
-          </Modal.Body>
-          <Modal.Footer>
-            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-              Add Supplier
-            </Button>
-          </Modal.Footer>
-          </form>
-          {/* onClick={() => setOpen(false)} */}
-        </Modal>
-      </>
-    );
-  };
-  
-  const AllUsersTable: FC = function () {
-    //@ts-ignore
-    const [data, setDogs] = React.useState<Dog[]>([]);
-    
-    useEffect(() => {
-    
-      // , where("mintType", "==", 'paid') 
-       const dogsCol = query(collection(db, "strexSupplier"), limit(10));
-      //  let dogsCol = collection(db, 'autoTopTrendingMints');
-        const unSubscribe = onSnapshot(dogsCol, dogsSnap => {
-            const dogsArray = dogsSnap.docs.map(dogSnap => {
-              //@ts-ignore
-                const dog = dogSnap.data() as Dog;
-                dog.id = dogSnap.id;
-                return dog;
-            });
-            // console.log('dogsArray1',dogsArray);
-            setDogs(dogsArray)     
-    
-            console.log(dogsArray);
-    // setRowData(dogsArray)
-    dogsArray.sort((a, b) => parseFloat(b.sixHourCount) - parseFloat(a.sixHourCount));
-    
-    // setRowData(dogsArray)
-    //       setRowDataold(dogsArray)
-    
-    // console.log('dogsArrayaftershort',dogsArray);
-    
-    
-        });
-    
-        return () => unSubscribe();
-    },[]);
-    
-    
-        return (
-          <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600 ">
-            <Table.Head className="bg-gray-100 dark:bg-gray-700">
-              <Table.HeadCell>
-                <Label htmlFor="select-all" className="sr-only">
-                  Select all
-                </Label>
-                <Checkbox id="select-all" name="select-all" />
-              </Table.HeadCell>
-              <Table.HeadCell>Company</Table.HeadCell>
-              <Table.HeadCell>Contact</Table.HeadCell>
-              <Table.HeadCell>Phone</Table.HeadCell>
-              <Table.HeadCell>Address</Table.HeadCell>
-              <Table.HeadCell>description</Table.HeadCell>
-              {/* <Table.HeadCell>email</Table.HeadCell> */}
-              {/* <Table.HeadCell>Country</Table.HeadCell> */}
-              {/* <Table.HeadCell>Status</Table.HeadCell> */}
-              <Table.HeadCell>Actions</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-    
-    
-    
-            {data.map(item => (
-              <Table.Row key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                <Table.Cell className="w-4 p-4">
-                  <div className="flex items-center">
-                    <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
-                    <label htmlFor="checkbox-1" className="sr-only">
-                      checkbox
-                    </label>
-                  </div>
-                </Table.Cell>
-                <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-                  <img
-                    className="h-10 w-10 rounded-full"
-                    src="/images/neil-sims.png"
-                    alt="Neil Sims avatar"
-                  />
-                  <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    <div className="text-base font-semibold text-gray-900 dark:text-white">
-                    {item?.company}
-                    </div>
-                    <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    {item?.email}
-                    </div>
-                  </div>
-                </Table.Cell>
-
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                  {item?.contact}
-                  </div>
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                  {item?.phone}
-                  </div>
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                  {item?.address}
-                  </div>
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                  {item?.description}
-                  </div>
-                </Table.Cell>
-
-
-               
-                {/* <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-                  <div className="flex items-center">
-                    <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-                    Active
-                  </div>
-                </Table.Cell> */}
-                <Table.Cell>
-                  <div className="flex items-center gap-x-3 whitespace-nowrap">
-                    <EditUserModal />
-                    <DeleteUserModal />
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-              ))}
-             
-             
-              
-            </Table.Body>
-          </Table>
-        );
-      };
-      
-  
-  const EditUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  
-    return (
-      <>
-        <Button color="primary" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-2">
-            <HiOutlinePencilAlt className="text-lg" />
-            Edit
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen}>
-          <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Edit</strong>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="firstName">First name</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Bonnie"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last name</Label>
-                <div className="mt-1">
-                  <TextInput id="lastName" name="lastName" placeholder="Green" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="email"
-                    name="email"
-                    placeholder="example@company.com"
-                    type="email"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone number</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="phone"
-                    name="phone"
-                    placeholder="e.g., +(12)3456 789"
-                    type="tel"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="department">Department</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="department"
-                    name="department"
-                    placeholder="Development"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="company">Company</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="company"
-                    name="company"
-                    placeholder="Somewhere"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="passwordCurrent">Current password</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="passwordCurrent"
-                    name="passwordCurrent"
-                    placeholder="••••••••"
-                    type="password"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="passwordNew">New password</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="passwordNew"
-                    name="passwordNew"
-                    placeholder="••••••••"
-                    type="password"
-                  />
-                </div>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button color="primary" onClick={() => setOpen(false)}>
-              Save all
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
-  };
-  
-  const DeleteUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  
-    return (
-      <>
-        <Button color="failure" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-2">
-            <HiTrash className="text-lg" />
-            Delete 
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
-          <Modal.Header className="px-6 pt-6 pb-0">
-            <span className="sr-only">Delete </span>
-          </Modal.Header>
-          <Modal.Body className="px-6 pt-0 pb-6">
-            <div className="flex flex-col items-center gap-y-6 text-center">
-              <HiOutlineExclamationCircle className="text-7xl text-red-500" />
-              <p className="text-xl text-gray-500">
-                Are you sure you want to delete this user?
-              </p>
-              <div className="flex items-center gap-x-3">
-                <Button color="failure" onClick={() => setOpen(false)}>
-                  Yes, I'm sure
-                </Button>
-                <Button color="gray" onClick={() => setOpen(false)}>
-                  No, cancel
-                </Button>
-              </div>
-            </div>
-          </Modal.Body>
-        </Modal>
-      </>
-    );
-  };
   
   // export const Pagination: FC = function () {
   //   return (

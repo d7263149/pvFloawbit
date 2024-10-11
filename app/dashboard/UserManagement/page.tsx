@@ -169,7 +169,7 @@ const [users, setUsers] = useState<User[]>([]);
     };
 
     const fetchRoles = async () => {
-      const rolesCollection = collection(db, 'roles');
+      const rolesCollection = collection(db, 'strexRoles');
       const roleDocs: QuerySnapshot<DocumentData> = await getDocs(rolesCollection);
       const rolesData: Role[] = roleDocs.docs.map(doc => ({
         id: doc.id,
