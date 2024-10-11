@@ -8,7 +8,10 @@ export const authOptions = {
   providers: [
     GoogleProvider({
     clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    httpOptions: {
+      timeout: 100000,
+    }
   }),
  
   
@@ -61,14 +64,8 @@ export const authOptions = {
     async session({ session, token, user }) {
           // Add custom properties to the session object
           session.user.id = 'ss';
-          if(session.user.email == 'pnna5555@gmail.com' || session.user.email == 'pnna5555@gmail.com'){
-            session.user.role = 'admin';
-          }else{
-            session.user.role= 'supplier';
-            // supplier
-          }
           session.user.role = token.role;
-          session.accessToken = session.user.email;
+          session.accessToken = 'token';
           return session;
         }
   }

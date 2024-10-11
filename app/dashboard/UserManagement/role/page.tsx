@@ -42,6 +42,8 @@ import {
     QuerySnapshot,
   } from 'firebase/firestore';
 import { useSession } from "next-auth/react";
+import { ToastContainer, toast } from 'react-toastify'; // Import Toast for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
   
   // Define the type for permissions
   type Permissions = {
@@ -208,6 +210,7 @@ const handleAddRole = async () => {
     };
     const docRef = await addDoc(collection(db, 'strexRoles'), newRole); // Add new role to Firestore
     setRoles([...roles, { ...newRole, id: docRef.id }]); // Update local state with the new role ID
+    toast.success('Role added successfully!');
     toggleModal(); // Close the modal after adding the role
   }
 };
@@ -229,6 +232,7 @@ const handleEditRole = async () => {
 
     // Update the local state
     setRoles(roles.map(role => (role.id === selectedRoleId ? updatedRole : role)));
+    toast.success('Role updated successfully!');
     toggleModal(); // Close the modal after updating the role
   }
 };
@@ -300,7 +304,9 @@ const handleNewPermissionChange = (permission: keyof Permissions) => {
 
 
                {/* ===================== */}
-               <div className="container mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg">
+               <div className=" mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg">
+
+               <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
             {/* Page Header */}
             {/* <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold">Role Management</h2>

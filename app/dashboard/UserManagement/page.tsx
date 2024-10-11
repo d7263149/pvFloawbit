@@ -34,33 +34,42 @@ import {
 //   import { collection, getDocs, orderBy, query, onSnapshot, doc, where, limit, addDoc } from 'firebase/firestore'
   
   import {signOut, useSession} from 'next-auth/react'
-  import { useTable } from 'react-table';
+
 
 //   ---------------------------------------------------------
+
+
+
+import { useTable, useSortBy, usePagination, useGlobalFilter, Row } from 'react-table';
 import {
-    collection,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    DocumentData,
-    QuerySnapshot,
-  } from 'firebase/firestore';
-  
-  interface User {
-    id: string;
-    name: string;
-    roleId: string;
-    phone: string;
-    address: string;
-    password: string; // Added password field
-  }
-  
-  interface Role {
-    id: string;
-    name: string;
-  }
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  DocumentData,
+  QuerySnapshot,
+} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify'; // Import Toast for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+
+interface User {
+  id: string;
+  name: string;
+  email: string; // Added email field
+  roleId: string;
+  phone: string;
+  address: string;
+  password: string; // Added password field
+  status: string; // Added status field
+}
+
+interface Role {
+  id: string;
+  name: string;
+}
+
 //   ===============================================
   const UserListPage: FC = function () {
     const mainurl = process.env.NEXT_PUBLIC_URL;
@@ -130,13 +139,17 @@ const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [newUserData, setNewUserData] = useState<Omit<User, 'id'>>({
     name: '',
+    email: '', // Initialize email
     roleId: '',
     phone: '',
     address: '',
     password: '', // Initialize password
+    status: 'active', // Initialize status as active
   });
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [showSearch, setShowSearch] = useState<boolean>(false); // State for search box
+  const [pageSize, setPageSize] = useState<number>(10); // State for page size
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -145,10 +158,12 @@ const [users, setUsers] = useState<User[]>([]);
       const usersData: User[] = userDocs.docs.map(doc => ({
         id: doc.id,
         name: doc.data().name,
+        email: doc.data().email, // Fetch email
         roleId: doc.data().roleId,
         phone: doc.data().phone,
         address: doc.data().address,
         password: doc.data().password || '', // Fetch password as well
+        status: doc.data().status || 'active', // Fetch status or default to active
       }));
       setUsers(usersData);
     };
@@ -177,10 +192,12 @@ const [users, setUsers] = useState<User[]>([]);
   const resetForm = () => {
     setNewUserData({
       name: '',
+      email: '', // Reset email
       roleId: '',
       phone: '',
       address: '',
       password: '', // Reset password
+      status: 'active',
     });
     setIsEditing(false);
     setSelectedUserId(null);
@@ -194,6 +211,7 @@ const [users, setUsers] = useState<User[]>([]);
       };
       const docRef = await addDoc(collection(db, 'strexUsers'), userData);
       setUsers([...users, { ...userData, id: docRef.id }]);
+      toast.success('User added successfully!');
       toggleModal();
     }
   };
@@ -202,6 +220,7 @@ const [users, setUsers] = useState<User[]>([]);
     if (selectedUserId) {
       await updateDoc(doc(db, 'strexUsers', selectedUserId), newUserData);
       setUsers(users.map(user => (user.id === selectedUserId ? { ...user, ...newUserData } : user)));
+      toast.success('User updated successfully!');
       toggleModal();
     }
   };
@@ -215,6 +234,7 @@ const [users, setUsers] = useState<User[]>([]);
     if (userToDelete) {
       await deleteDoc(doc(db, 'strexUsers', userToDelete));
       setUsers(users.filter(user => user.id !== userToDelete));
+      toast.success('User deleted successfully!');
       setIsDeleteConfirmOpen(false);
       setUserToDelete(null);
     }
@@ -228,6 +248,14 @@ const [users, setUsers] = useState<User[]>([]);
     }));
   };
 
+
+  const toggleUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    await updateDoc(doc(db, 'strexUsers', userId), { status: newStatus });
+    setUsers(users.map(user => (user.id === userId ? { ...user, status: newStatus } : user)));
+    toast.success('User status updated successfully!');
+  };
+  
   // Prepare data for the react-table
   const data = React.useMemo(() => users.map(user => ({
     ...user,
@@ -241,6 +269,10 @@ const [users, setUsers] = useState<User[]>([]);
         accessor: 'name',
       },
       {
+        Header: 'Email',
+        accessor: 'email', // Display email field
+      },
+      {
         Header: 'Role',
         accessor: 'roleName', // Display role name
       },
@@ -251,6 +283,17 @@ const [users, setUsers] = useState<User[]>([]);
       {
         Header: 'Address',
         accessor: 'address',
+      },
+      {
+        Header: 'Status',
+        accessor: 'status', // Display the user status
+        Cell: ({ row }: { row: { original: User } }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-semibold ${row.original.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+          >
+            {row.original.status}
+          </span>
+        ),
       },
       {
         Header: 'Actions',
@@ -289,6 +332,14 @@ const [users, setUsers] = useState<User[]>([]);
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+
+            <button
+            className={`text-sm px-2 py-1 rounded-full ${row.original.status === 'active' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}
+            onClick={() => toggleUserStatus(row.original.id, row.original.status)}
+          >
+            {row.original.status === 'active' ? 'Deactivate' : 'Activate'}
+          </button>
+          
           </div>
         ),
       },
@@ -296,13 +347,32 @@ const [users, setUsers] = useState<User[]>([]);
     [users, roles]
   );
 
+  // useTable, useSortBy, usePagination, and useGlobalFilter hooks
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
-    prepareRow,
-  } = useTable({ columns, data });
+    prepareRow, //@ts-ignore
+    page, //@ts-ignore
+    canPreviousPage, //@ts-ignore
+    canNextPage, //@ts-ignore
+    pageOptions, //@ts-ignore
+    gotoPage, //@ts-ignore
+    nextPage, //@ts-ignore
+    previousPage, //@ts-ignore
+    setGlobalFilter, //@ts-ignore
+    state: { pageIndex, globalFilter },
+  } = useTable(
+    { //@ts-ignore
+      columns,
+      data, //@ts-ignore
+      initialState: { pageIndex: 0, pageSize: 10 }, // Set initial page index and page size
+    },
+    useGlobalFilter, // Search
+    useSortBy, // Sorting
+    usePagination // Pagination
+  );
     // [[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]
 
 
@@ -318,7 +388,10 @@ const [users, setUsers] = useState<User[]>([]);
       <NavbarSidebarLayout isFooter={false}>
         <div className="flex mb-4 .content  ">
         {/* <AddUserModal /> */}
-        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={toggleModal}>
+        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"  onClick={() => {
+            resetForm();
+            toggleModal();
+          }}>
           <div className="flex items-center gap-x-3">
             <HiPlus className="text-xl" />
             Add User
@@ -344,40 +417,113 @@ const [users, setUsers] = useState<User[]>([]);
 
 {/* ---------------------------- */}
 
-<div className="container mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg	">
-
-
-
-      {/* <div className="flex justify-between items-center mb-6">
+<div className=" mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg	">
+{/* <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">User Management</h2>
         <button
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
-          onClick={toggleModal}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={() => {
+            resetForm();
+            toggleModal();
+          }}
         >
           Add User
         </button>
       </div> */}
 
-      <div className="overflow-x-auto">
-        <table {...getTableProps()} className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
+      {/* Top Toolbar */}
+      <div className="flex justify-between items-center mb-4">
+        {/* Left side: Number of rows dropdown */}
+        <div className="flex items-center space-x-2">
+          <label className="text-sm font-medium">Show</label>
+          <select
+            className="border border-gray-300 rounded-md p-1"
+            value={pageSize}
+            onChange={e => setPageSize(Number(e.target.value))}
+          >
+            {[10, 25, 50].map(size => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm font-medium">entries</label>
+        </div>
+
+        {/* Right side: Search box */}
+        <div className="relative"  style={{marginTop: '-33px'
+              }}>
+          {/* <button onClick={() => setShowSearch(prev => !prev)} className="text-gray-500 hover:text-gray-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-5.5 5.5m-1.25-1.25a6 6 0 118.5 0l-1.25 1.25M10.5 5.5a6 6 0 118.5 8.5" />
+            </svg>
+            
+          </button> */}
+           
+           <input
+              type="text"
+              className="absolute top-0 right-0 w-20 md:w-40  border border-gray-300 rounded-md p-1 transition-all duration-300"
+              value={globalFilter || ''}
+              onChange={e => setGlobalFilter(e.target.value)}
+              placeholder="Search"
+              onFocus={(e) => e.target.classList.add('w-40')}
+             
+            />
+
+          {showSearch && (
+            <input
+              type="text"
+              className="absolute top-0 right-0 w-20 md:w-40 mt-2 border border-gray-300 rounded-md p-1 transition-all duration-300"
+              value={globalFilter || ''}
+              onChange={e => setGlobalFilter(e.target.value)}
+              placeholder="Search"
+              onFocus={(e) => e.target.classList.add('w-40')}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="relative overflow-x-auto border rounded-lg">
+        <table {...getTableProps()} className="min-w-full leading-normal">
           <thead>
             {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()} className="bg-gray-200">
-                {headerGroup.headers.map(column => (
-                  <th {...column.getHeaderProps()} className="py-2 px-4 border-b text-left">
-                    {column.render('Header')}
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => ( //@ts-ignore
+                  <th //@ts-ignore
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    {column.render('Header') }
+                    <span>{ 
+                     //@ts-ignore
+                    column.isSorted ? (column.isSortedDesc ? ' ▼' : ' ▲') : ''}</span>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {rows.map(row => {
+            {page.map((row: Row<{
+                roleName: string; id: string; name: string; email: string; // Added email field
+                // Added email field
+                roleId: string; phone: string; address: string; password: string; // Added password field
+                // Added password field
+                status: string; // Added status field
+              }>) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="border-b hover:bg-gray-100 transition">
+                <tr {...row.getRowProps()} className="hover:bg-gray-100">
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()} className="py-2 px-4">
+                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm">
                       {cell.render('Cell')}
                     </td>
                   ))}
@@ -388,7 +534,39 @@ const [users, setUsers] = useState<User[]>([]);
         </table>
       </div>
 
-      {/* Modal for Adding/Editing User */}
+      {/* Bottom Toolbar */}
+      <div className="flex justify-between items-center mt-4">
+        <div className="text-sm text-gray-700">
+          Showing {pageIndex * pageSize + 1} to {Math.min((pageIndex + 1) * pageSize, rows.length)} of {rows.length} entries
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Previous
+          </button>
+
+          <span>
+            Page{' '}
+            <strong>
+              {pageIndex + 1} of {pageOptions.length}
+            </strong>
+          </span>
+
+          <button
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
           <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
@@ -406,6 +584,18 @@ const [users, setUsers] = useState<User[]>([]);
             </div>
 
             <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={newUserData.email}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                placeholder="Enter email"
+              />
+            </div>
+
+            <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">Role</label>
               <select
                 name="roleId"
@@ -415,7 +605,9 @@ const [users, setUsers] = useState<User[]>([]);
               >
                 <option value="">Select Role</option>
                 {roles.map(role => (
-                  <option key={role.id} value={role.id}>{role.name}</option>
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -498,326 +690,15 @@ const [users, setUsers] = useState<User[]>([]);
         </div>
       )}
     </div>
-
         {/* ----------------------------- */}
         {/* <Pagination /> */}
       </NavbarSidebarLayout>
     );
   };
   
-  const AddUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  // ========================================
 
-
-  const mainurl = process.env.NEXT_PUBLIC_URL;
-  const session:any = useSession();
-  const [alert, setAlert] = React.useState('none');
-  const [getemail, setEmail] = React.useState('');
-  const [selectedOption, setSelectedOption] = useState('customer');
-
-const [formData, setFormData] = useState({
-company: '',
-role: selectedOption,
-phone: '',
-address: '',
-email: getemail,
-description: '',
-});
-
-// Handle input changes
-const handleChange = (e: { target: { id: any; value: any; }; }) => {
-const { id, value } = e.target;
-setFormData((prevData) => ({
-  ...prevData,
-  [id]: value
-}));
-};
-
-// Handle form submission
-const handleSubmit = async (e: { preventDefault: () => void; }) => {
-e.preventDefault();
-console.log('Form Data:', formData);
-// Process or send formData to a server here
-
-try {
-    // Insert into Firestore
-    const docRef = await addDoc(collection(db, 'strexUsers'), {
-        name: formData.company,
-        address: formData.description,
-      phone: formData.phone,
-      email: formData.email,
-      role: selectedOption,
-    });
-    setAlert("block");
-    console.log('Document written with ID: ', docRef.id);
-    // session.user.newid = 23;
-    // session.user.role = 'supplier';
-
-
-    setTimeout(function(){  
-      // window.location.href=mainurl+'/dashboard';
-      setOpen(false)
-     }, 2000);
-    
-   
-  } catch (e) {
-    console.error('Error adding document: ', e);
-  }
-  
-};
-
-const handleSelectChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-    setSelectedOption(event.target.value);
-  };
   
 
-  // ==========================
-    return (
-      <>
-        <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-            Add User
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen}>
-        <form onSubmit={handleSubmit} className="">
-          <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Add new User</strong>
-          </Modal.Header>
-          <Modal.Body>
-          <Alert id="alert" style={{display:alert}} color="success">
-      <span className="font-medium">Info alert!</span> Successfully save
-    </Alert>
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="firstName">Name</Label>
-                <div className="mt-1">
-                <TextInput id="company" type="text" value={formData.company}
-          onChange={handleChange} placeholder=""  required />
-                </div>
-              </div>
-              
-              
-              
-               <div>
-                <Label htmlFor="firstName">Role</Label>
-                <div className="mt-1">
-                {/* <TextInput id="contact" type="text" value={formData.contact}
-          onChange={handleChange} placeholder=""  required /> */}
-            {/* <label htmlFor="options">Choose an option:</label> */}
-      <select id="options" value={selectedOption} onChange={handleSelectChange}>
-        <option value="">--Please choose an option--</option>
-        <option value="customer">customer</option>
-        <option value="supplier">Supplier</option>
-      </select>
-                </div>
-              </div>
-
-
-              <div>
-                <Label htmlFor="firstName">Phone</Label>
-                <div className="mt-1">
-                <TextInput id="phone"     value={formData.phone}   onChange={handleChange} type="text" required />
-                </div>
-              </div>
-
-
-
-
-              <div>
-                <Label htmlFor="firstName">Email</Label>
-                <div className="mt-1">
-                <TextInput id="email"  value={formData.email}
-          onChange={handleChange} type="text" required  />
-                </div>
-              </div>
-
-
-            
-
-
-         
-
-
-              </div>
-              <div className="mt-2">
-                <Label htmlFor="firstName">address</Label>
-                <div className="mt-1">
-                <TextInput id="description"  value={formData.description}
-          onChange={handleChange} type="text" required />
-                </div>
-              </div>
-   
-     
-    
-   
-      {/* <div className="flex items-center gap-2">
-        <Checkbox id="remember" />
-        <Label htmlFor="remember">Remember me</Label>
-      </div> */}
-    
-   
-          </Modal.Body>
-          <Modal.Footer>
-            <Button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit" color="primary" >
-              Add User
-            </Button>
-          </Modal.Footer>
-          </form>
-          {/* onClick={() => setOpen(false)} */}
-        </Modal>
-      </>
-    );
-  };
-
-      
-  
-  const EditUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  
-    return (
-      <>
-        <Button color="primary" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-2">
-            <HiOutlinePencilAlt className="text-lg" />
-            
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen}>
-          <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-            <strong>Edit</strong>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="firstName">First name</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Bonnie"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last name</Label>
-                <div className="mt-1">
-                  <TextInput id="lastName" name="lastName" placeholder="Green" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="email"
-                    name="email"
-                    placeholder="example@company.com"
-                    type="email"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone number</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="phone"
-                    name="phone"
-                    placeholder="e.g., +(12)3456 789"
-                    type="tel"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="department">Department</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="department"
-                    name="department"
-                    placeholder="Development"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="company">Company</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="company"
-                    name="company"
-                    placeholder="Somewhere"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="passwordCurrent">Current password</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="passwordCurrent"
-                    name="passwordCurrent"
-                    placeholder="••••••••"
-                    type="password"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="passwordNew">New password</Label>
-                <div className="mt-1">
-                  <TextInput
-                    id="passwordNew"
-                    name="passwordNew"
-                    placeholder="••••••••"
-                    type="password"
-                  />
-                </div>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button color="primary" onClick={() => setOpen(false)}>
-              Save all
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
-  };
-  
-  const DeleteUserModal: FC = function () {
-    const [isOpen, setOpen] = useState(false);
-  
-    return (
-      <>
-        <Button color="failure" onClick={() => setOpen(true)}>
-          <div className="flex items-center gap-x-2">
-            <HiTrash className="text-lg" />
-             
-          </div>
-        </Button>
-        <Modal onClose={() => setOpen(false)} show={isOpen} size="md">
-          <Modal.Header className="px-6 pt-6 pb-0">
-            <span className="sr-only">Delete </span>
-          </Modal.Header>
-          <Modal.Body className="px-6 pt-0 pb-6">
-            <div className="flex flex-col items-center gap-y-6 text-center">
-              <HiOutlineExclamationCircle className="text-7xl text-red-500" />
-              <p className="text-xl text-gray-500">
-                Are you sure you want to delete this user?
-              </p>
-              <div className="flex items-center gap-x-3">
-                <Button color="failure" onClick={() => setOpen(false)}>
-                  Yes, I'm sure
-                </Button>
-                <Button color="gray" onClick={() => setOpen(false)}>
-                  No, cancel
-                </Button>
-              </div>
-            </div>
-          </Modal.Body>
-        </Modal>
-      </>
-    );
-  };
   
   // export const Pagination: FC = function () {
   //   return (
