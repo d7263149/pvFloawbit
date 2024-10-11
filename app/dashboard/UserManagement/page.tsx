@@ -518,10 +518,10 @@ const [users, setUsers] = useState<User[]>([]);
                 roleId: string; phone: string; address: string; password: string; // Added password field
                 // Added password field
                 status: string; // Added status field
-              }>) => {
+              }>,index: React.Key | null | undefined) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="hover:bg-gray-100">
+                <tr {...row.getRowProps()} key={index} className="hover:bg-gray-100">
                   {row.cells.map(cell => (
                     <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm">
                       {cell.render('Cell')}
