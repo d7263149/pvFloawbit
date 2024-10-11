@@ -523,7 +523,7 @@ const [users, setUsers] = useState<User[]>([]);
               return (
                 <tr {...row.getRowProps()}  className={"hover:bg-gray-100 row"+row.id} key={row?.id}>
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm" key={row?.id+cell?.id}>
+                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm" key={row?.id}>
                       {cell.render('Cell')}
                     </td>
                   ))}
