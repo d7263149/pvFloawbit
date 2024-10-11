@@ -496,11 +496,11 @@ const [users, setUsers] = useState<User[]>([]);
         <table {...getTableProps()} className="min-w-full leading-normal">
           <thead>
             {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup?.id}>
                 {headerGroup.headers.map(column => ( //@ts-ignore
                   <th //@ts-ignore
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"  key={column.id}
+                    className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"  key={column?.id}
                   >
                     {column.render('Header') }
                     <span>{ 
@@ -521,9 +521,9 @@ const [users, setUsers] = useState<User[]>([]);
               }>) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}  className={"hover:bg-gray-100 row"+row.id} key={row.id}>
+                <tr {...row.getRowProps()}  className={"hover:bg-gray-100 row"+row.id} key={row?.id}>
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm">
+                    <td {...cell.getCellProps()} className="px-5 py-2 border-b text-sm" key={row?.id+cell?.id}>
                       {cell.render('Cell')}
                     </td>
                   ))}
