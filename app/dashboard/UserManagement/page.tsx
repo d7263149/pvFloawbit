@@ -496,11 +496,11 @@ const [users, setUsers] = useState<User[]>([]);
         <table {...getTableProps()} className="min-w-full leading-normal">
           <thead>
             {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
                 {headerGroup.headers.map(column => ( //@ts-ignore
                   <th //@ts-ignore
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                    className="px-5 py-3 border-b-2 bg-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"  key={column.id}
                   >
                     {column.render('Header') }
                     <span>{ 
