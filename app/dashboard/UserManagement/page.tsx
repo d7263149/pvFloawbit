@@ -136,7 +136,7 @@ const [users, setUsers] = useState<User[]>([]);
       resetForm();
     }
   };
-
+ 
   const resetForm = () => {
     setNewUserData({
       name: '',
