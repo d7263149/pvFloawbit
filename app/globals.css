@@ -135,5 +135,28 @@ body{
 border-r{
     border-radius: 5px;
 }
+
+.d-none{
+    display: none;
+}
+.capitalize, .capitalize span, .capitalize a , .capitalize h1{
+    text-transform: capitalize;
+}
+::-webkit-input-placeholder {
+    text-transform: capitalize;
+ }
+ 
+ :-moz-placeholder { 
+    text-transform: capitalize;
+ }
+ 
+ ::-moz-placeholder {  
+    text-transform: capitalize;
+ }
+ 
+ :-ms-input-placeholder { 
+    text-transform: capitalize;
+ }
+
 /* //////////admin css/////////////////////// */
  

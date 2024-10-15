@@ -78,58 +78,6 @@ interface Role {
     const [getemail, setEmail] = React.useState('');
     const [selectedOption, setSelectedOption] = useState('');
 
-const [formData, setFormData] = useState({
-  company: '',
-  contact: '',
-  phone: '',
-  address: '',
-  email: getemail,
-  description: '',
-});
-
-// Handle input changes
-const handleChange = (e: { target: { id: any; value: any; }; }) => {
-  const { id, value } = e.target;
-  setFormData((prevData) => ({
-    ...prevData,
-    [id]: value
-  }));
-};
-
-// Handle form submission
-const handleSubmit = async (e: { preventDefault: () => void; }) => {
-  e.preventDefault();
-  console.log('Form Data:', formData);
-  // Process or send formData to a server here
-
-  try {
-      // Insert into Firestore
-      const docRef = await addDoc(collection(db, 'strexUsers'), {
-          company: formData.company,
-        description: formData.description,
-        contact: formData.contact,
-        phone: formData.phone,
-        address: formData.address,
-        email: getemail,
-        role: 'supplier',
-      });
-      setAlert("block");
-      console.log('Document written with ID: ', docRef.id);
-      // session.user.newid = 23;
-      session.user.role = 'supplier';
-
-
-      setTimeout(function(){  
-        window.location.href=mainurl+'/dashboard';
-       }, 2000);
-      
-     
-    } catch (e) {
-      console.error('Error adding document: ', e);
-    }
-    
-};
-
 
 //   [[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]
 const [users, setUsers] = useState<User[]>([]);
@@ -378,12 +326,6 @@ const [users, setUsers] = useState<User[]>([]);
 
 
 
-
-
-
-
-
-
     return (
       <NavbarSidebarLayout isFooter={false}>
         <div className="flex mb-4 .content  ">
@@ -397,12 +339,7 @@ const [users, setUsers] = useState<User[]>([]);
             Add User
           </div>
         </Button>
-        {/* <Button color="primary" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-0 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
-          <div className="flex items-center gap-x-3">
-            <HiPlus className="text-xl" />
-            Import Expenses
-          </div>
-        </Button> */}
+  
         </div>
     
 
@@ -418,18 +355,7 @@ const [users, setUsers] = useState<User[]>([]);
 {/* ---------------------------- */}
 
 <div className=" mx-auto  white-bg pt-6 pb-6 pl-2 pr-2 rounded-lg	">
-{/* <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">User Management</h2>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={() => {
-            resetForm();
-            toggleModal();
-          }}
-        >
-          Add User
-        </button>
-      </div> */}
+
 
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
@@ -455,18 +381,7 @@ const [users, setUsers] = useState<User[]>([]);
         {/* Right side: Search box */}
         <div className="relative"  style={{marginTop: '-33px'
               }}>
-          {/* <button onClick={() => setShowSearch(prev => !prev)} className="text-gray-500 hover:text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-5.5 5.5m-1.25-1.25a6 6 0 118.5 0l-1.25 1.25M10.5 5.5a6 6 0 118.5 8.5" />
-            </svg>
-            
-          </button> */}
+     
            
            <input
               type="text"
@@ -579,7 +494,7 @@ const [users, setUsers] = useState<User[]>([]);
                 value={newUserData.name}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                placeholder="Enter user name"
+                placeholder="Enter Name"
               />
             </div>
 
@@ -591,7 +506,7 @@ const [users, setUsers] = useState<User[]>([]);
                 value={newUserData.email}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                placeholder="Enter email"
+                placeholder="Enter Email"
               />
             </div>
 
@@ -620,7 +535,7 @@ const [users, setUsers] = useState<User[]>([]);
                 value={newUserData.phone}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                placeholder="Enter phone number"
+                placeholder="Enter Phone Number"
               />
             </div>
 
@@ -644,7 +559,7 @@ const [users, setUsers] = useState<User[]>([]);
                 value={newUserData.password}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                placeholder="Enter password"
+                placeholder="Enter Password"
               />
             </div>
 
@@ -699,55 +614,6 @@ const [users, setUsers] = useState<User[]>([]);
 
   
 
-  
-  // export const Pagination: FC = function () {
-  //   return (
-  //     <div className="sticky right-0 bottom-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
-  //       <div className="mb-4 flex items-center sm:mb-0">
-  //         <a
-  //           href="#"
-  //           className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-  //         >
-  //           <span className="sr-only">Previous page</span>
-  //           <HiChevronLeft className="text-2xl" />
-  //         </a>
-  //         <a
-  //           href="#"
-  //           className="mr-2 inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-  //         >
-  //           <span className="sr-only">Next page</span>
-  //           <HiChevronRight className="text-2xl" />
-  //         </a>
-  //         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-  //           Showing&nbsp;
-  //           <span className="font-semibold text-gray-900 dark:text-white">
-  //             1-20
-  //           </span>
-  //           &nbsp;of&nbsp;
-  //           <span className="font-semibold text-gray-900 dark:text-white">
-  //             2290
-  //           </span>
-  //         </span>
-  //       </div>
-  //       <div className="flex items-center space-x-3">
-  //         <a
-  //           href="#"
-  //           className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 py-2 px-3 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-  //         >
-  //           <HiChevronLeft className="mr-1 text-base" />
-  //           Previous
-  //         </a>
-  //         <a
-  //           href="#"
-  //           className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 py-2 px-3 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-  //         >
-  //           Next
-  //           <HiChevronRight className="ml-1 text-base" />
-  //         </a>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-  
+
   export default UserListPage;
   

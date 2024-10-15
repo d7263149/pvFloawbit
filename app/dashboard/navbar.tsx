@@ -46,7 +46,7 @@ const ExampleNavbar: FC = function () {
 {!session?.data ?(
 <>
 
-      <DarkThemeToggle />
+      {/* <DarkThemeToggle /> */}
         
       
     
@@ -56,7 +56,7 @@ const ExampleNavbar: FC = function () {
 <>
 
 
-      <DarkThemeToggle />
+      {/* <DarkThemeToggle /> */}
         <Dropdown
           arrowIcon={false}
           inline

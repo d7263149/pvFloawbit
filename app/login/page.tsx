@@ -15,13 +15,13 @@ return(
    
 
        {/* <Header/> */}
-       <div className="mt-[40px]">
+       <div className="mt-[80px]">
        <div className="company-logo text-center">
             <a href={mainurl} className="logo img-responsive">
         <img src="/images/black.png" style={{    height: '62px'}} className="img-responsive" alt=" CRM" />
         </a>        </div>
 
-       <h2 style={{    fontSize: '22px'}} className="   tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-10">
+       <h2 style={{    fontSize: '22px'}} className="   tw-text-neutral-800 text-center tw-font-semibold tw-mb-5 mb-4 mt-8">
             Login        </h2>
 
    <Card className="max-w-sm  center-card1  mt-[20px]">
@@ -44,13 +44,15 @@ return(
           <Checkbox id="remember" />
           <Label htmlFor="remember">Remember me</Label>
         </div>
-        <Button type="submit">Submit</Button>
+        <Button type="submit"  color="blue">Login</Button>
       </form>
    {/* <button onClick={()=>signIn('google')}>Login google </button> */}
    
      
-     <Button onClick={()=>signIn('google',{ callbackUrl: '/redirect' })} type="submit">Google Login</Button>
-     <Button  color="dark" href={mainurl+'/register'}>Register</Button>
+     <Button onClick={()=>signIn('google',{ callbackUrl: '/redirect' })} type="submit"  color="dark" >Continue with Google</Button>
+     {/* <Button  color="dark">Register</Button> */}
+     <p className="text-center ">Don't have an account? <a className="text-blue-600 hover:text-blue-800"  href={mainurl+'/register'}>Rigister</a></p>
+     
    </div>
  </Card>
  </div>

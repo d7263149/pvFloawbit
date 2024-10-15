@@ -321,7 +321,7 @@ const handleNewPermissionChange = (permission: keyof Permissions) => {
             {/* Role List */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {roles.map((role, roleIndex) => (
-                <div key={role.id} className="bg-white shadow-md rounded-lg p-4">
+                <div key={role.id} className="bg-white shadow-md rounded-lg p-4 capitalize">
                   <h3 className="text-lg font-bold mb-3">{role.name}</h3>
                   <ul className="space-y-2">
                     {Object.keys(role.permissions).map((permission) => (
@@ -349,7 +349,7 @@ const handleNewPermissionChange = (permission: keyof Permissions) => {
             {/* Modal for adding or editing a role */}
             {isModalOpen && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                <div className="bg-white p-6 rounded-lg shadow-lg w-96 capitalize">
                   <h3 className="text-lg font-bold mb-4">{isEditing ? 'Edit Role' : 'Add New Role'}</h3>
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-2">Role Name</label>
