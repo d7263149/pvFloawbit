@@ -77,7 +77,7 @@ export default function Register() {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    router.push('/'); // Redirect to the login page
+    // router.push('/'); // Redirect to the login page
   };
 
 
