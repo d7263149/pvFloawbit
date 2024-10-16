@@ -101,7 +101,7 @@ export default function Login() {
               </div>
             </form>
             <Button onClick={handleGoogleSignIn} color="blue" disabled={isButtonDisabled}>
-              {session?.user ? "Proceed to Register" : "Verify with Google"}
+              {session?.user ? "Verify" : "Verify"}
             </Button>
           </div>
         </Card>
