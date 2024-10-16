@@ -30,7 +30,7 @@ export default function Register() {
       setFormData(JSON.parse(storedData));
       sessionStorage.removeItem('registerData'); // Clear stored data after retrieval
     } else if (!session?.user) {
-      router.push('/'); // Redirect to login if user is not logged in
+    //   router.push('/'); // Redirect to login if user is not logged in
     }
   }, [session, router]);
 
