@@ -27,13 +27,22 @@ export default function Login() {
     description: ''
   });
 
-  useEffect(() => {
+
+ useEffect(() => {
     // Check if the user is already signed in
     if (session?.user) {
-      // Redirect directly to the registration page if signed in
-      router.push('/process');
+      // Check if all fields are filled in session storage
+      const storedData = sessionStorage.getItem('registerData');
+      if (storedData) {
+        const data: FormData = JSON.parse(storedData);
+        setFormData(data); // Set form data to the stored data
+        // Redirect to registration page if all fields are filled
+        if (data.company && data.contact && data.phone && data.companyEmail && data.description) {
+          router.push('/process');
+        }
+      }
     }
-  }, [session, router]);
+  }, [session, router,sessionStorage.getItem('registerData')]);
 
   const handleGoogleSignIn = async () => {
     // Sign in with Google
