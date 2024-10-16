@@ -32,6 +32,7 @@ export default function Login() {
   });
 
   const checkIfUserExists = async (email: any) => {
+    console.log('email',email)
     const q = query(collection(db, 'strexUsers'), where('email', '==', email));
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty; // If there's at least one document, user exists
@@ -52,10 +53,24 @@ export default function Login() {
         }
         
       }
-    let c:any =   checkIfUserExists(session?.user?.email);
-    if(c){
-        router.push(mainurl + '?msg=already register user');
-    }
+    //   async function () => checknesws {
+    // //   let c:any =   checkIfUserExists(session?.user?.email);
+    //   
+    // // let c:any =   checkIfUserExists('ranchirock@gmail.com');
+    //   }
+    const myAsyncFunction = async () => {
+        // Asynchronous code goes here
+        const userExists = await checkIfUserExists(session?.user?.email);
+        console.log('userExists',userExists)
+        if(userExists){
+       
+            router.push(mainurl + '?msg=already register user');
+        }
+
+      };
+
+      myAsyncFunction();
+
 
 
     }
