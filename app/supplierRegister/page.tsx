@@ -6,6 +6,8 @@ import { signIn, useSession } from "next-auth/react";
 import { Button, Card, Label, TextInput, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from '../../compnents/firebase'; // Ensure this is the correct path to your firebase.js
 
 interface FormData {
   company: string;
@@ -16,6 +18,8 @@ interface FormData {
 }
 
 export default function Login() {
+
+    
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -27,7 +31,13 @@ export default function Login() {
     description: ''
   });
 
+  const checkIfUserExists = async (email: any) => {
+    const q = query(collection(db, 'strexUsers'), where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty; // If there's at least one document, user exists
+  };
 
+  const mainurl = process.env.NEXT_PUBLIC_URL;
  useEffect(() => {
     // Check if the user is already signed in
     if (session?.user) {
@@ -38,15 +48,23 @@ export default function Login() {
         setFormData(data); // Set form data to the stored data
         // Redirect to registration page if all fields are filled
         if (data.company && data.contact && data.phone && data.companyEmail && data.description) {
-          router.push('/process');
+        //   router.push('/process');
         }
+        
       }
+    let c:any =   checkIfUserExists(session?.user?.email);
+    if(c){
+        router.push(mainurl + '?msg=already register user');
     }
-  }, [session, router,sessionStorage.getItem('registerData')]);
+
+
+    }
+
+  }, [session, router]);
 
   const handleGoogleSignIn = async () => {
     // Sign in with Google
-    await signIn('google', { redirect: false }).then(async (response) => {
+    await signIn('google', { callbackUrl: '/process' }).then(async (response) => {
       if (response?.error) {
         console.error('Error signing in with Google:', response.error);
         return;

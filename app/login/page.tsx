@@ -3,16 +3,56 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Avatar, Button, Card, Checkbox, DarkThemeToggle, Dropdown, Label, Navbar, TextInput } from "flowbite-react";
 import Header from '../../compnents/header';
+// pages/_app.js
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+// import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from 'react-toastify'; // Import Toast for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { useSearchParams } from 'next/navigation';
+
 
 
 export default function Login(){
+// console.log('props',props.msg);
+const searchParams:any = useSearchParams();
+  // const searchParams = useSearchParams()
+ 
+  const search:any = searchParams.get('msg')
+
+
     const session = useSession();
     const mainurl = process.env.NEXT_PUBLIC_URL;
+
+
+
+    useEffect(() => {
+      // Function to check for the 'msg' query parameter
+ 
+  
+        if (search) {
+          // showToast('working');
+          toast.success(search);
+        }
+ 
+  
+      // router.events.on('routeChangeComplete', handleRouteChange);
+  
+      // // Clean up the event listener
+      // return () => {
+      //   router.events.off('routeChangeComplete', handleRouteChange);
+      // };
+    }, [search]);
+
+
+
+
+    
     // console.log('session',session)
 return(
     <main className="main">
-        
-   
+      
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
        {/* <Header/> */}
        <div className="mt-[80px]">
@@ -59,4 +99,8 @@ return(
  </main>
 
 )
+}
+
+function showToast(message: string) {
+  throw new Error("Function not implemented.");
 }

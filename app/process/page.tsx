@@ -32,7 +32,7 @@ export default function Register() {
     } else if (!session?.user) {
     //   router.push('/'); // Redirect to login if user is not logged in
     }
-  }, [session, router]);
+  }, [session]);
 
   const checkIfUserExists = async (email: string) => {
     const q = query(collection(db, 'strexUsers'), where('email', '==', email));
@@ -82,7 +82,8 @@ export default function Register() {
 
 
   const handleBackButtonClick = () => {
-    router.back(); // Go back to the previous page
+   // router.back(); // Go back to the previous page supplierRegister
+   router.push('/supplierRegister');
   };
   return (
     <main className="main">
