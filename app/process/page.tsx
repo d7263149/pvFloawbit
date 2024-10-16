@@ -50,10 +50,12 @@ export default function Register() {
         await addDoc(collection(db, 'strexUsers'), {
           email,
           ...formData,
+          roleId:"LDO0IAcLCscqhNv7cYlv",
+          status:"active",
           createdAt: new Date()
         });
         console.log("User data added successfully!");
-        router.push('/success'); // Redirect to a success page after data is saved
+        router.push('/dashboard'); // Redirect to a success page after data is saved
       } catch (e) {
         console.error("Error adding document: ", e);
       }
