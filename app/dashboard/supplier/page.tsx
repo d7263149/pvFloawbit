@@ -164,7 +164,7 @@ const [users, setUsers] = useState<User[]>([]);
     const fetchUsers = async () => {
       // const usersCollection = collection(db, 'strexUsers'); 
       const usersCollection = query(collection(db, "strexUsers"), where('roleId', "==", "LDO0IAcLCscqhNv7cYlv"), limit(1000));
-      const userDocs: QuerySnapshot<DocumentData> = await getDocs(usersCollection);
+      const userDocs: QuerySnapshot<DocumentData> = await getDocs(usersCollection);  //@ts-ignore
       const usersData: User[] = userDocs.docs.map(doc => ({
         id: doc.id,
         company: doc.data().company,
@@ -209,6 +209,7 @@ const [users, setUsers] = useState<User[]>([]);
       email: '', // Reset email
       roleId: 'LDO0IAcLCscqhNv7cYlv',
       phone: '123456',
+      updateDoc:'',
       address: '',
       password: '', // Reset password
       status: 'active',
