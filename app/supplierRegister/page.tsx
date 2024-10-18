@@ -62,7 +62,7 @@ export default function Register() {
   };
 
   // Input change handler
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -128,6 +128,8 @@ export default function Register() {
             </div>
             <div>
                 <Label htmlFor="description" value="Description" />
+                {//@ts-ignore
+                }
                 <Textarea id="description" name='description' placeholder="Description"  onChange={handleChange} />
               </div>
               
