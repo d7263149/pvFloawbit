@@ -180,7 +180,7 @@ const SupplierList = () => {
               </button>
             </div>
           ))
-        ) : (
+        ) : ( 
           <p className="text-gray-500 col-span-full text-center">No suppliers available.</p>
         )}
       </div>
