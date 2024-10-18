@@ -1,147 +1,161 @@
-// Login.tsx
-
 'use client';
 
-import { signIn, useSession } from "next-auth/react";
-import { Button, Card, Label, TextInput, Textarea } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { TextInput, Button, Card, Label, Modal, Textarea } from "flowbite-react";
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from '../../compnents/firebase'; // Ensure this is the correct path to your firebase.js
+import { ToastContainer, toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
+import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore'; 
+import { db } from '../../compnents/firebase'; // import your Firebase config
 
+// const db = getFirestore(app);
+
+// Define types for form data
 interface FormData {
   company: string;
+  email: string;
   contact: string;
   phone: string;
-  companyEmail: string;
-  description: string;
+  roleId: string;
+  status: string;
 }
 
-export default function Login() {
-
-    
-  const { data: session } = useSession();
+export default function Register() {
   const router = useRouter();
 
+  // State for modal and form data
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     company: '',
+    email: '',
     contact: '',
     phone: '',
-    companyEmail: '',
-    description: ''
+    roleId: 'supplier', // Assuming a default role for suppliers
+    status: 'LDO0IAcLCscqhNv7cYlv'
   });
 
-  const checkIfUserExists = async (email: any) => {
-    console.log('email',email)
-    const q = query(collection(db, 'strexUsers'), where('email', '==', email));
+  // Function to check if companyEmail exists in Firebase
+  const checkIfEmailExists = async (email: string): Promise<boolean> => {
+    const q = query(collection(db, 'strexUsers'), where('companyEmail', '==', email));
     const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty; // If there's at least one document, user exists
+    return !querySnapshot.empty;
   };
 
-  const mainurl = process.env.NEXT_PUBLIC_URL;
- useEffect(() => {
-    // Check if the user is already signed in
-    if (session?.user) {
-      // Check if all fields are filled in session storage
-      const storedData = sessionStorage.getItem('registerData');
-      if (storedData) {
-        const data: FormData = JSON.parse(storedData);
-        setFormData(data); // Set form data to the stored data
-        // Redirect to registration page if all fields are filled
-        if (data.company && data.contact && data.phone && data.companyEmail && data.description) {
-        //   router.push('/process');
-        }
-        
-      }
-    //   async function () => checknesws {
-    // //   let c:any =   checkIfUserExists(session?.user?.email);
-    //   
-    // // let c:any =   checkIfUserExists('ranchirock@gmail.com');
-    //   }
-    const myAsyncFunction = async () => {
-        // Asynchronous code goes here
-        const userExists = await checkIfUserExists(session?.user?.email);
-        console.log('userExists',userExists)
-        if(userExists){
-       
-            router.push(mainurl + '?msg=already register user');
-        }
+  // Form submit handler
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-      };
+    try {
+      const emailExists = await checkIfEmailExists(formData.email);
 
-      myAsyncFunction();
-
-
-
-    }
-
-  }, [session, router]);
-
-  const handleGoogleSignIn = async () => {
-    // Sign in with Google
-    await signIn('google', { callbackUrl: '/process' }).then(async (response) => {
-      if (response?.error) {
-        console.error('Error signing in with Google:', response.error);
+      if (emailExists) {
+        setShowErrorModal(true); // Show error modal if email already exists
         return;
       }
-      
-      // Store form data to session storage if Google sign in is successful
-      sessionStorage.setItem('registerData', JSON.stringify(formData));
-      router.push('/process'); // Redirect to registration page
-    });
+
+      await addDoc(collection(db, 'strexUsers'), formData); // Save to Firebase
+      setShowModal(true); // Show success modal
+    } catch (error) {
+      toast.error("Registration failed. Please try again."); // Error handling
+    }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [id]: value
-    }));
+  // Input change handler
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  // Disable button if not all fields are filled
-  const isButtonDisabled = !formData.company || !formData.contact || !formData.phone || !formData.companyEmail || !formData.description;
 
   return (
     <main className="main">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className="mt-[80px]">
-        <h2 className="text-center font-semibold mb-4 mt-8" style={{ fontSize: '22px' }}>
+        <div className="company-logo text-center">
+          <a href={process.env.NEXT_PUBLIC_URL} className="logo img-responsive">
+            <img src="/images/black.png" style={{ height: '62px' }} className="img-responsive" alt=" CRM" />
+          </a>
+        </div>
+
+        <h2 style={{ fontSize: '22px' }} className="text-center text-neutral-800 font-semibold mb-5 mt-8">
           Supplier Registration
         </h2>
 
         <Card className="max-w-sm center-card1 mt-[20px]">
-          <div className="flex flex-col gap-4">
-            <form className="flex flex-col gap-2">
-              <div>
-                <Label htmlFor="company" value="Company Name" />
-                <TextInput id="company" type="text" placeholder="Company Name" required value={formData.company} onChange={handleInputChange} />
-              </div>
-
-              <div>
-                <Label htmlFor="contact" value="Contact" />
-                <TextInput id="contact" type="text" placeholder="Contact" required value={formData.contact} onChange={handleInputChange} />
-              </div>
-
-              <div>
-                <Label htmlFor="phone" value="Phone" />
-                <TextInput id="phone" type="text" placeholder="Phone" required value={formData.phone} onChange={handleInputChange} />
-              </div>
-
-              <div>
-                <Label htmlFor="companyEmail" value="Company Email" />
-                <TextInput id="companyEmail" type="text" placeholder="Company Email" required value={formData.companyEmail} onChange={handleInputChange} />
-              </div>
-
-              <div>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <div>
+              <Label htmlFor="companyName" value="Company Name" />
+              <TextInput
+                id="company"
+                name="companyName"
+                type="text"
+                placeholder="Enter company name"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="companyEmail" value="Company Email" />
+              <TextInput
+                id="companyEmail"
+                name="email"
+                type="email"
+                placeholder="name@company.com"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="contact" value="Contact Person" />
+              <TextInput
+                id="contact"
+                name="contact"
+                type="text"
+                placeholder="Enter contact person"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" value="Phone" />
+              <TextInput
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="Enter phone number"
+                required
+                onChange={handleChange}
+              />
+            </div>
+            <div>
                 <Label htmlFor="description" value="Description" />
-                <Textarea id="description" placeholder="Description" required value={formData.description} onChange={handleInputChange} />
+                <Textarea id="description" name='description' placeholder="Description"  onChange={handleChange} />
               </div>
-            </form>
-            <Button onClick={handleGoogleSignIn} color="blue" disabled={isButtonDisabled}>
-              Verify
-            </Button>
-          </div>
+              
+            <Button type="submit" color="blue">Register</Button>
+          </form>
         </Card>
+
+        {/* Success Modal */}
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <Modal.Header>Registration Pending</Modal.Header>
+          <Modal.Body>
+            <p>Your registration is pending approval. We will update you shortly.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => router.push('/')}>OK</Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Error Modal for existing email */}
+        <Modal show={showErrorModal} onClose={() => setShowErrorModal(false)}>
+          <Modal.Header>Email Already Exists</Modal.Header>
+          <Modal.Body>
+            <p>The email you have entered is already registered. Please try with a different email.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => setShowErrorModal(false)}>OK</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </main>
   );

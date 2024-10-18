@@ -59,10 +59,11 @@ import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 interface User {
   id: string;
-  cname: string;
+  company: string;
   contact:string;
   description:string;
   email: string; // Added email field
+  updateDoc:string;
   roleId: string;
   phone: string;
   address: string;
@@ -143,11 +144,12 @@ const [users, setUsers] = useState<User[]>([]);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [newUserData, setNewUserData] = useState<Omit<User, 'id'>>({
-    cname: '',
+    company: '',
     contact:'',
     description:'',
     email: '', // Initialize email
     roleId: '',
+    updateDoc:'',
     phone: '',
     address: '',
     password: '', // Initialize password
@@ -165,7 +167,7 @@ const [users, setUsers] = useState<User[]>([]);
       const userDocs: QuerySnapshot<DocumentData> = await getDocs(usersCollection);
       const usersData: User[] = userDocs.docs.map(doc => ({
         id: doc.id,
-        cname: doc.data().cname,
+        company: doc.data().company,
         contact: doc.data().contact,
         description: doc.data().description,
         email: doc.data().email, // Fetch email
@@ -201,12 +203,12 @@ const [users, setUsers] = useState<User[]>([]);
 
   const resetForm = () => {
     setNewUserData({
-      cname: '',
+      company: '',
       contact: '',
       description:'',
       email: '', // Reset email
       roleId: 'LDO0IAcLCscqhNv7cYlv',
-      phone: '',
+      phone: '123456',
       address: '',
       password: '', // Reset password
       status: 'active',
@@ -216,7 +218,7 @@ const [users, setUsers] = useState<User[]>([]);
   };
 
   const handleAddUser = async () => {
-    if (newUserData.cname && newUserData.roleId) {
+    if (newUserData.company && newUserData.roleId) {
       const userData: User = {
         id: '',
         ...newUserData,
@@ -276,7 +278,7 @@ const [users, setUsers] = useState<User[]>([]);
 
   const columns = React.useMemo(
     () => [
-      { Header: 'Company Name', accessor: 'cname' },
+      { Header: 'Company Name', accessor: 'company' },
     { Header: 'Contact', accessor: 'contact' },
     { Header: 'Phone', accessor: 'phone' },
    
@@ -573,8 +575,8 @@ const [users, setUsers] = useState<User[]>([]);
               <label className="block text-sm font-medium text-gray-700">Company Name</label>
               <input
                 type="text"
-                name="cname"
-                value={newUserData.cname}
+                name="company"
+                value={newUserData.company}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 placeholder="Enter Company Name"
@@ -646,7 +648,7 @@ const [users, setUsers] = useState<User[]>([]);
               />
             </div>
 
-            <div className="mb-4">
+            <div className="mb-4 d-none">
               <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
                 type="password"
