@@ -147,7 +147,7 @@ const SupplierList = () => {
     {/* Main content */}
     <main className="w-full md:w-3/4 order-3 md:order-none">
       {/* Map section - Hidden on mobile */}
-      <div className="h-72 mb-8 bg-gray-100 flex justify-center items-center rounded-lg shadow-md hidden md:flex">
+      <div className="h-72 mb-8 bg-gray-100 justify-center items-center rounded-lg shadow-md hidden md:flex">
         <FaMapMarkerAlt className="text-4xl text-gray-500" />
         <p className="text-gray-500 ml-2">Map View - Coming soon</p>
       </div>
