@@ -122,9 +122,10 @@ const SupplierList = () => {
 
       {/* Supplier List Page */}
       <div className="container mx-auto px-4 py-8">
-  <div className="flex  md:space-x-6"> {/* Added md:space-x-6 for gap between sidebar and main content */}
+  {/* Flexbox for larger screens */}
+  <div className="flex flex-wrap md:flex-nowrap md:space-x-6 space-y-6 md:space-y-0"> 
     {/* Sidebar for filters */}
-    <aside className="w-full md:w-1/4 bg-white rounded-lg p-4 shadow-md mb-6 md:mb-0">
+    <aside className="w-full md:w-1/4 bg-white rounded-lg p-4 shadow-md order-1 md:order-none">
       <h2 className="text-lg font-semibold mb-4">Supplier Filters</h2>
 
       {/* Category Filter */}
@@ -144,11 +145,9 @@ const SupplierList = () => {
     </aside>
 
     {/* Main content */}
-    <main className="w-full md:w-3/4">
-      {/* <h1 className="text-2xl font-bold mb-6">Supplier List</h1> */}
-
-      {/* Map section */}
-      <div className="h-72 mb-8 bg-gray-100 flex justify-center items-center rounded-lg shadow-md">
+    <main className="w-full md:w-3/4 order-3 md:order-none">
+      {/* Map section - Hidden on mobile */}
+      <div className="h-72 mb-8 bg-gray-100 flex justify-center items-center rounded-lg shadow-md hidden md:flex">
         <FaMapMarkerAlt className="text-4xl text-gray-500" />
         <p className="text-gray-500 ml-2">Map View - Coming soon</p>
       </div>
@@ -164,10 +163,7 @@ const SupplierList = () => {
               <h3 className="text-lg font-semibold mb-2">{supplier.contact}</h3>
               <p className="text-gray-600 mb-4">{supplier.description}</p>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-blue-500 font-bold text-lg">
-                  {/* {supplier.location} */}
-                </span>
-                {/* Display categories associated with the supplier */}
+                <span className="text-blue-500 font-bold text-lg"></span>
                 <div className="flex flex-wrap gap-1">
                   {getCategoriesByUserId(supplier.id).map((categoryName) => (
                     <span
